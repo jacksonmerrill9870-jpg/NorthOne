@@ -1,0 +1,166 @@
+.container {
+  max-width: 450px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+
+.header {
+  height: 60px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--white);
+}
+
+.logo {
+  height: 40px;
+  width: auto;
+}
+
+.balanceCard {
+  background: var(--card-gradient);
+  padding: 40px 20px 60px 20px;
+  text-align: center;
+  color: var(--white);
+  position: relative;
+}
+
+.balanceLabel {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.9;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.balanceAmount {
+  font-size: 48px;
+  font-weight: 400;
+  margin-bottom: 40px;
+}
+
+.vaultSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: -40px;
+  position: relative;
+  z-index: 10;
+}
+
+.vaultCircle {
+  width: 110px;
+  height: 110px;
+  background-color: var(--white);
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.vaultTitle {
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.vaultAmount {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.stashBtn {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--white);
+  padding: 10px 25px;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.stashBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.featureList {
+  margin-top: 30px;
+  padding: 0 20px;
+  flex-grow: 1;
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+}
+
+.featureIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f0fcf0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  color: var(--primary-green);
+}
+
+.featureText {
+  flex-grow: 1;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.chevron {
+  color: var(--border-color);
+}
+
+.bottomNav {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background-color: var(--white);
+  border-top: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.navItemActive {
+  color: var(--primary-green);
+}
+
+.lockIcon {
+  margin-top: 4px;
+  color: var(--text-secondary);
+}
