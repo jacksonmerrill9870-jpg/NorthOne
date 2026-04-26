@@ -1,0 +1,163 @@
+.container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--app-bg);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  height: 60px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  background-color: var(--white);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  color: var(--primary-green);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 5px 10px 5px 0;
+}
+
+.headerTitle {
+  flex-grow: 1;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-right: 24px; /* to balance the back button width */
+}
+
+.transactionList {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 10px 0;
+  background-color: var(--white);
+}
+
+.dateHeader {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background-color: var(--app-bg);
+}
+
+.transactionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.transactionItem:last-child {
+  border-bottom: none;
+}
+
+.transactionLeft {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.transactionIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.iconDeposit {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.iconWithdrawal {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.transactionDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.merchantName {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.transactionCategory {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.transactionRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.amount {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.amountPositive {
+  color: var(--primary-green);
+}
+
+.amountNegative {
+  color: var(--text-main);
+}
+
+.status {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.statusPending {
+  color: #ed6c02;
+}
+
+.deleteButton {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  padding: 4px;
+  margin-left: 10px;
+  transition: color 0.2s ease;
+}
+
+.deleteButton:hover {
+  color: #ef5350;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
