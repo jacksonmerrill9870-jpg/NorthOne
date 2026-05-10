@@ -80,10 +80,8 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch all users (for admin) and current user data when activeUserId changes
+  // Fetch all users (for admin) and current user data
   useEffect(() => {
-    if (!activeUserId) return;
-
     const fetchData = async () => {
       // 1. Fetch Profiles
       const { data: profiles, error: pError } = await supabase
@@ -141,7 +139,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
       txSub.unsubscribe();
       msgSub.unsubscribe();
     };
-  }, [activeUserId]);
+  }, []);
 
   const createAccount = async (email: string, fullName: string, country: string) => {
     // This is handled by supabase.auth.signUp in LoginPage
