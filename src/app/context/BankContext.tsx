@@ -203,14 +203,14 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
       
       const cashback = amountToDeduct * 0.02;
       
-      const newMessage = {
+      const newMessage: MessageItem = {
         id: Date.now(),
         iconType: 'success',
         title: "Transaction Completed",
         body: `Your transaction of $${amountToDeduct.toLocaleString('en-US', {minimumFractionDigits: 2})} to ${merchantName} was successfully completed. You earned $${cashback.toLocaleString('en-US', {minimumFractionDigits: 2})} in Vault cashback!`,
         time: "Just now",
         alert: false
-      } as any;
+      };
       
       return { 
         ...u, 
@@ -239,7 +239,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
         })
       }));
       
-      const newMessage = {
+      const newMessage: MessageItem = {
         id: Date.now(),
         iconType: 'error',
         title: "Transaction Failed",
