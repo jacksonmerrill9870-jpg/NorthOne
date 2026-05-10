@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   description: "Mobile Banking App Replicated with Next.js",
 };
 
+import { Providers } from './Providers';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -13,7 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

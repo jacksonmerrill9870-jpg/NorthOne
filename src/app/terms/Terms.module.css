@@ -1,0 +1,125 @@
+/* ============================
+   Terms & Conditions Page Styles
+   ============================ */
+
+.termsWrapper {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center;
+  padding: 60px 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.termsContainer {
+  background: #ffffff;
+  max-width: 800px;
+  width: 100%;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.03);
+  padding: 48px 56px;
+  overflow: hidden;
+}
+
+.header {
+  margin-bottom: 40px;
+  border-bottom: 1px solid #eaeaea;
+  padding-bottom: 24px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.5px;
+}
+
+.lastUpdated {
+  font-size: 14px;
+  color: #888888;
+  margin: 0;
+}
+
+.content {
+  color: #4a4a4a;
+  line-height: 1.7;
+  font-size: 16px;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  color: #5cb85c;
+}
+
+.text {
+  margin: 0 0 16px 0;
+}
+
+.list {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.listItem {
+  margin-bottom: 8px;
+}
+
+.footer {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid #eaeaea;
+  display: flex;
+  justify-content: center;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background-color: #f0faf0;
+  color: #43a047;
+  border: 1px solid #5cb85c;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.backButton:hover {
+  background-color: #5cb85c;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(92, 184, 92, 0.2);
+}
+
+@media (max-width: 600px) {
+  .termsWrapper {
+    padding: 20px 16px;
+  }
+  
+  .termsContainer {
+    padding: 32px 24px;
+    border-radius: 16px;
+  }
+  
+  .title {
+    font-size: 26px;
+  }
+}

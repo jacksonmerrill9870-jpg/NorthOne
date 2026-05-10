@@ -1,16 +1,27 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Trash2 } from 'lucide-react';
+import { X, Trash2, CheckCircle, XCircle, Sparkles, ShieldAlert, AlertTriangle, ArrowDownLeft } from 'lucide-react';
 import styles from './MessagesModal.module.css';
 
 export interface MessageItem {
   id: number;
-  icon: React.ReactNode;
+  iconType: 'success' | 'error' | 'alert' | 'welcome' | 'deposit';
   title: string;
   body: string;
   time: string;
   alert: boolean;
 }
+
+const renderIcon = (type: string) => {
+  switch (type) {
+    case 'success': return <CheckCircle size={20} color="#fff" />;
+    case 'error': return <XCircle size={20} color="#fff" />;
+    case 'alert': return <AlertTriangle size={20} color="#fff" />;
+    case 'welcome': return <Sparkles size={20} color="#fff" />;
+    case 'deposit': return <ArrowDownLeft size={20} color="#fff" />;
+    default: return <Sparkles size={20} color="#fff" />;
+  }
+};
 
 interface MessagesModalProps {
   isOpen: boolean;
@@ -82,8 +93,8 @@ export default function MessagesModal({ isOpen, onClose, messages, onDeleteMessa
                       exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
                       transition={{ duration: 0.2 }}
                     >
-                      <div className={`${styles.iconWrapper} ${msg.alert ? styles.iconAlert : ''}`}>
-                        {msg.icon}
+                      <div className={`${styles.messageIcon} ${msg.alert ? styles.iconAlert : ''}`}>
+                        {renderIcon(msg.iconType)}
                       </div>
                       <div className={styles.messageText}>
                         <div className={styles.messageTitle}>{msg.title}</div>

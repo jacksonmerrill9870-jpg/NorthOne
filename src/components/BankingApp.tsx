@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import styles from './BankingApp.module.css';
 import SettingsModal from './SettingsModal';
@@ -10,6 +10,12 @@ import type { TransactionGroup } from './TransactionsPage';
 import PaymentModal from './PaymentModal';
 import MessagesModal from './MessagesModal';
 import type { MessageItem } from './MessagesModal';
+import VerificationModal from './VerificationModal';
+import VaultModal from './VaultModal';
+import ChatBotModal from './ChatBotModal';
+import CardManagementModal from './CardManagementModal';
+import DepositModal from './DepositModal';
+import WaiverModal from './WaiverModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ChevronLeft, 
@@ -29,57 +35,19 @@ import {
   Sparkles,
   AlertTriangle
 } from 'lucide-react';
-
-// Initial transaction data
-const initialTransactions: TransactionGroup[] = [
-  { id: 1, date: 'Today', items: [
-    { id: 't1', type: 'withdrawal', merchant: 'Whole Foods Market', category: 'Paid', amount: 136.02, pending: false },
-    { id: 't2', type: 'deposit', merchant: 'Incoming Wire Transfer', category: 'Deposit', amount: 89600.00, pending: false }
-  ]},
-  { id: 2, date: 'Yesterday', items: [
-    { id: 't3', type: 'withdrawal', merchant: 'Transfer to John Doe', category: 'Sent', amount: 500.00, pending: false },
-    { id: 't4', type: 'withdrawal', merchant: 'Office Space Rent', category: 'Paid', amount: 1500.00, pending: false }
-  ]},
-  { id: 3, date: 'Last Week', items: [
-    { id: 't5', type: 'deposit', merchant: 'Initial Funding', category: 'Deposit', amount: 20000.00, pending: false }
-  ]}
-];
-
-const initialMessages: MessageItem[] = [
-  {
-    id: 1,
-    icon: <ArrowDownLeft size={20} />,
-    title: "Incoming Wire Received",
-    body: "We have successfully processed an incoming wire transfer of $89,600.00. The funds are now available in your available balance.",
-    time: "Today at 9:41 AM",
-    alert: false
-  },
-  {
-    id: 2,
-    icon: <ShieldAlert size={20} />,
-    title: "New Device Login",
-    body: "Your account was accessed from a new device (Windows PC) in Austin, TX. If this wasn't you, please secure your account immediately.",
-    time: "Yesterday at 4:12 PM",
-    alert: true
-  },
-  {
-    id: 3,
-    icon: <Sparkles size={20} />,
-    title: "You're Pre-Approved!",
-    body: "Good news, Luke! Based on your account activity, you've been pre-approved for the NorthOne Business Credit line up to $50,000.",
-    time: "Mar 22 at 11:30 AM",
-    alert: false
-  }
-];
+import { useBank } from '@/app/context/BankContext';
 
 export default function BankingApp() {
+  const bank = useBank();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
-  const [isTransferBlocked, setIsTransferBlocked] = useState(false);
-  const [balance, setBalance] = useState(107463.98);
-  const [transactionGroups, setTransactionGroups] = useState<TransactionGroup[]>(initialTransactions);
-  const [messages, setMessages] = useState<MessageItem[]>(initialMessages);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isVaultOpen, setIsVaultOpen] = useState(false);
+  const [isCardOpen, setIsCardOpen] = useState(false);
+  const [isDepositOpen, setIsDepositOpen] = useState(false);
+  const [isWaiverOpen, setIsWaiverOpen] = useState(false);
+  const [vaultMode, setVaultMode] = useState<'stash' | 'unstash'>('stash');
   const [activePage, setActivePage] = useState<'home' | 'profile' | 'transactions'>('home');
 
   const containerVariants = {
@@ -100,56 +68,58 @@ export default function BankingApp() {
   };
 
   const handleTransactionComplete = (record: { bank: string; name: string; email: string; amount: number }) => {
+    if (!bank.activeUser) return;
+    if (bank.activeUser.status === 'restricted' || bank.activeUser.status === 'frozen') {
+      handleBlockedTransferAttempt();
+      return;
+    }
+
     const newTransaction = {
       id: `t${Date.now()}`,
       type: 'withdrawal' as const,
       merchant: `Transfer to ${record.name} (${record.bank})`,
       category: 'Sent',
       amount: record.amount,
-      pending: false
+      pending: true // Made pending, wait for admin approval
     };
 
-    // Add transaction to history
-    setTransactionGroups(prev => {
-      const updated = [...prev];
-      if (updated[0] && updated[0].date === 'Today') {
-        updated[0] = { ...updated[0], items: [newTransaction, ...updated[0].items] };
-      } else {
-        updated.unshift({ id: Date.now(), date: 'Today', items: [newTransaction] });
-      }
-      return updated;
-    });
-
-    // Deduct from balance
-    setBalance(prev => prev - record.amount);
+    bank.addTransaction(newTransaction);
+    // Note: Do NOT deduct from balance yet.
   };
 
   const handleBlockedTransferAttempt = () => {
     const now = new Date();
     const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-    const newMessage: MessageItem = {
+    bank.addMessage({
       id: Date.now(),
       icon: <AlertTriangle size={20} />,
       title: "Account Restricted",
-      body: "Your account is restricted. We are sorry, you can't send or receive money at the moment. Kindly contact your account assistance.",
+      body: "Your account is restricted or frozen. We are sorry, you can't send or receive money at the moment. Kindly contact support.",
       time: `Today at ${timeStr}`,
       alert: true
-    };
-    setMessages(prev => [newMessage, ...prev]);
+    });
   };
 
   const handleDeleteMessage = (id: number) => {
-    setMessages(prev => prev.filter(m => m.id !== id));
+    // Currently BankContext doesn't expose deleteMessage, so we skip or we would need to add it to BankContext.
+    // For now, let's keep it simple and just do nothing here since Admin manages it, 
+    // or we can update BankContext later if needed.
   };
 
   const handleDeleteTransaction = (transactionId: string) => {
-    setTransactionGroups(prev => 
-      prev.map(group => ({
-        ...group,
-        items: group.items.filter(item => item.id !== transactionId)
-      }))
-    );
+    bank.deleteTransaction(transactionId);
   };
+
+  const derivedMessages = useMemo(() => {
+    if (!bank.activeUser) return [];
+    const msgs = [...bank.activeUser.messages];
+    if (bank.activeUser.status === 'frozen') {
+      msgs.unshift({ id: 9991, iconType: 'alert', title: 'Account Frozen', body: 'Your account has been temporarily frozen. Please contact support.', time: 'System Alert', alert: true } as any);
+    } else if (bank.activeUser.status === 'restricted') {
+      msgs.unshift({ id: 9992, iconType: 'alert', title: 'Account Restricted', body: 'Your account has restrictions. Outgoing transfers are disabled.', time: 'System Alert', alert: true } as any);
+    }
+    return msgs;
+  }, [bank.activeUser?.messages, bank.activeUser?.status]);
 
   return (
     <>
@@ -181,14 +151,14 @@ export default function BankingApp() {
           </motion.div>
           <motion.div whileTap={{ scale: 0.9 }} onClick={() => setIsMessagesOpen(true)} style={{ cursor: 'pointer', position: 'relative' }}>
             <MessageSquare size={24} color="#5cb85c" strokeWidth={1.5} />
-            {messages.length > 0 && (
+            {bank.activeUser && bank.activeUser.messages.length > 0 && (
               <span style={{
                 position: 'absolute', top: -5, right: -5,
                 backgroundColor: '#ef5350', color: '#fff',
                 fontSize: 10, fontWeight: 700,
                 width: 16, height: 16, borderRadius: '50%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center'
-              }}>{messages.length}</span>
+              }}>{bank.activeUser.messages.length}</span>
             )}
           </motion.div>
         </header>
@@ -198,18 +168,16 @@ export default function BankingApp() {
           className={styles.balanceCard}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ delay: 0.3 }}
         >
-          <div className={styles.balanceLabel}>ACCOUNT BALANCE (CARD ENDING IN 3208)</div>
-          <motion.div 
-            className={styles.balanceAmount}
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 100 }}
-            key={balance}
-          >
-            ${formatBalance(balance)}
-          </motion.div>
+          <div className={styles.balanceHeader}>
+            <span>{bank.activeUser?.profileName || 'Loading'}'s Available Balance</span>
+            <span className={styles.balanceAccount}>...{bank.activeUser?.cardNumber?.slice(-4) || '1234'}</span>
+          </div>
+          <h2 className={styles.balanceAmount}>
+            <span className={styles.currencySymbol}>$</span>
+            {formatBalance(bank.activeUser?.balance || 0)}
+          </h2>
           
           {/* Vault Section */}
           <div className={styles.vaultSection}>
@@ -217,6 +185,7 @@ export default function BankingApp() {
               className={styles.stashBtn}
               whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.3)" }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => { setVaultMode('stash'); setIsVaultOpen(true); }}
             >
               STASH
             </motion.button>
@@ -229,7 +198,7 @@ export default function BankingApp() {
               transition={{ duration: 3, repeat: Infinity }}
             >
               <span className={styles.vaultTitle}>VAULT</span>
-              <span className={styles.vaultAmount}>$261.89</span>
+              <span className={styles.vaultAmount}>${(bank.activeUser?.vaultBalance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               <Lock size={12} className={styles.lockIcon} />
             </motion.div>
             
@@ -237,6 +206,7 @@ export default function BankingApp() {
               className={styles.stashBtn}
               whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.3)" }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => { setVaultMode('unstash'); setIsVaultOpen(true); }}
             >
               UNSTASH
             </motion.button>
@@ -246,10 +216,10 @@ export default function BankingApp() {
         {/* Feature List */}
         <section className={styles.featureList}>
           {[
-            { icon: <Zap size={20} />, text: "ASAP Direct Deposit™" },
+            { icon: <Zap size={20} />, text: "ASAP Direct Deposit™", comingSoon: true },
             { icon: <List size={20} />, text: "Transactions", onClick: () => setActivePage('transactions') },
-            { icon: <BarChart2 size={20} />, text: "Monthly Charge Waiver" },
-            { icon: <MapPin size={20} />, text: "ATM & Cash Deposit Map" },
+            { icon: <BarChart2 size={20} />, text: "Monthly Charge Waiver", onClick: () => setIsWaiverOpen(true) },
+            { icon: <MapPin size={20} />, text: "ATM & Cash Deposit Map", comingSoon: true },
           ].map((item, idx) => (
             <motion.div 
               key={idx}
@@ -260,17 +230,22 @@ export default function BankingApp() {
               onClick={item.onClick}
             >
               <div className={styles.featureIcon}>{item.icon}</div>
-              <div className={styles.featureText}>{item.text}</div>
+              <div className={styles.featureText}>
+                {item.text}
+                {item.comingSoon && <span className={styles.comingSoonBadge}>Coming Soon</span>}
+              </div>
               <ChevronRight size={20} className={styles.chevron} />
             </motion.div>
           ))}
         </section>
 
+        {/* Removed Recent Transactions */}
+
         {/* Bottom Nav */}
         <nav className={styles.bottomNav}>
           {[
             { icon: <Home size={24} />, label: "Home", active: true },
-            { icon: <PlusSquare size={24} />, label: "Deposit" },
+            { icon: <PlusSquare size={24} />, label: "Deposit", onClick: () => setIsDepositOpen(true) },
             { icon: <ArrowUpRight size={24} />, label: "Pay", onClick: () => setIsPaymentOpen(true) },
             { icon: <Settings size={24} />, label: "Account", onClick: () => setIsSettingsOpen(true) },
           ].map((nav, idx) => (
@@ -293,12 +268,25 @@ export default function BankingApp() {
             setIsSettingsOpen(false);
             setActivePage('profile');
           }}
+          onOpenSupport={() => {
+            setIsSettingsOpen(false);
+            setIsChatOpen(true);
+          }}
+          onOpenNotifications={() => {
+            setIsSettingsOpen(false);
+            setIsMessagesOpen(true);
+          }}
+          onOpenCard={() => {
+            setIsSettingsOpen(false);
+            setIsCardOpen(true);
+          }}
+          onLogout={bank.logout}
         />
 
         <PaymentModal 
           isOpen={isPaymentOpen}
           onClose={() => setIsPaymentOpen(false)}
-          isTransferBlocked={isTransferBlocked}
+          isTransferBlocked={bank.activeUser?.status === 'restricted' || bank.activeUser?.status === 'frozen'}
           onTransactionComplete={handleTransactionComplete}
           onBlockedAttempt={handleBlockedTransferAttempt}
         />
@@ -306,7 +294,7 @@ export default function BankingApp() {
         <MessagesModal 
           isOpen={isMessagesOpen}
           onClose={() => setIsMessagesOpen(false)}
-          messages={messages}
+          messages={derivedMessages}
           onDeleteMessage={handleDeleteMessage}
         />
       </motion.div>
@@ -315,18 +303,49 @@ export default function BankingApp() {
         {activePage === 'profile' && (
           <ProfilePage 
             onBack={() => setActivePage('home')} 
-            isTransferBlocked={isTransferBlocked}
-            onToggleTransfer={() => setIsTransferBlocked(prev => !prev)}
+            isTransferBlocked={bank.activeUser?.status === 'restricted' || bank.activeUser?.status === 'frozen'}
+            onToggleTransfer={() => {}}
           />
         )}
         {activePage === 'transactions' && (
           <TransactionsPage 
             onBack={() => setActivePage('home')} 
-            transactionGroups={transactionGroups}
+            transactionGroups={bank.activeUser?.transactions || []}
             onDeleteTransaction={handleDeleteTransaction}
           />
         )}
       </AnimatePresence>
+
+      <VaultModal 
+        isOpen={isVaultOpen}
+        onClose={() => setIsVaultOpen(false)}
+        mode={vaultMode}
+      />
+
+      <ChatBotModal 
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+      />
+
+      <CardManagementModal 
+        isOpen={isCardOpen}
+        onClose={() => setIsCardOpen(false)}
+      />
+
+      <DepositModal 
+        isOpen={isDepositOpen}
+        onClose={() => setIsDepositOpen(false)}
+      />
+
+      <WaiverModal
+        isOpen={isWaiverOpen}
+        onClose={() => setIsWaiverOpen(false)}
+      />
+
+      <VerificationModal 
+        isOpen={!!bank.activeUser && !bank.activeUser.isVerified}
+        onComplete={() => {}}
+      />
     </>
   );
 }

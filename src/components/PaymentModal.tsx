@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle, XCircle } from 'lucide-react';
+import { X, CheckCircle, XCircle, Clock } from 'lucide-react';
 import styles from './PaymentModal.module.css';
 
 interface TransactionRecord {
@@ -139,17 +139,17 @@ export default function PaymentModal({ isOpen, onClose, isTransferBlocked, onTra
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: "spring", damping: 20 }}
                 >
-                  <div className={`${styles.resultIcon} ${resultState === 'success' ? styles.resultIconSuccess : styles.resultIconFail}`}>
-                    {resultState === 'success' ? <CheckCircle size={32} /> : <XCircle size={32} />}
+                  <div className={`${styles.resultIcon} ${resultState === 'success' ? styles.resultIconSuccess : styles.resultIconFail}`} style={resultState === 'success' ? { backgroundColor: '#f0ad4e', color: '#fff' } : {}}>
+                    {resultState === 'success' ? <Clock size={32} /> : <XCircle size={32} />}
                   </div>
 
-                  <h3 className={`${styles.resultTitle} ${resultState === 'success' ? styles.resultTitleSuccess : styles.resultTitleFail}`}>
-                    {resultState === 'success' ? 'Transaction Completed' : 'Transaction Failed'}
+                  <h3 className={`${styles.resultTitle} ${resultState === 'success' ? styles.resultTitleSuccess : styles.resultTitleFail}`} style={resultState === 'success' ? { color: '#f0ad4e' } : {}}>
+                    {resultState === 'success' ? 'Transaction Pending' : 'Transaction Failed'}
                   </h3>
 
                   <p className={styles.resultMessage}>
                     {resultState === 'success' 
-                      ? `$${parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2 })} has been successfully sent to ${recipientName}.`
+                      ? `Your transaction of $${parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2 })} to ${recipientName} is currently pending review.`
                       : 'Transaction failed. Please contact your account manager for assistance.'}
                   </p>
 

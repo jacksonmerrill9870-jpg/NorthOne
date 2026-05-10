@@ -1,0 +1,199 @@
+.adminContainer {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Inter', sans-serif;
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.userSelector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.userSelector label {
+  font-weight: 600;
+  color: #555;
+}
+
+.selectUserDropdown {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  min-width: 200px;
+  outline: none;
+}
+
+.selectUserDropdown:focus {
+  border-color: #5cb85c;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.cardTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  color: #333;
+}
+
+.formGroup {
+  margin-bottom: 16px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #5cb85c;
+}
+
+.button {
+  background: #5cb85c;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.button:hover {
+  opacity: 0.9;
+}
+
+.statusSection {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.subTitle {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.badge {
+  background: #e9ecef;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 10px;
+}
+
+.buttonGroup .button {
+  background: #f1f3f5;
+  color: #333;
+}
+
+.buttonGroup .active {
+  background: #5cb85c;
+  color: white;
+}
+
+.buttonGroup .restricted {
+  background: #f0ad4e;
+  color: white;
+}
+
+.buttonGroup .frozen {
+  background: #d9534f;
+  color: white;
+}
+
+.transactionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.txMerchant {
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.txAmount {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.txActions {
+  display: flex;
+  gap: 8px;
+}
+
+.approve {
+  background: #5cb85c;
+}
+
+.decline {
+  background: #d9534f;
+}
+
+.emptyState {
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+}

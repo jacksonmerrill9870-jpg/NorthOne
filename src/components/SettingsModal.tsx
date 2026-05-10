@@ -7,9 +7,13 @@ interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenProfile: () => void;
+  onLogout: () => void;
+  onOpenSupport: () => void;
+  onOpenNotifications: () => void;
+  onOpenCard: () => void;
 }
 
-export default function SettingsModal({ isOpen, onClose, onOpenProfile }: SettingsModalProps) {
+export default function SettingsModal({ isOpen, onClose, onOpenProfile, onLogout, onOpenSupport, onOpenNotifications, onOpenCard }: SettingsModalProps) {
   const modalVariants = {
     hidden: { y: "100%", opacity: 0 },
     visible: { 
@@ -32,11 +36,10 @@ export default function SettingsModal({ isOpen, onClose, onOpenProfile }: Settin
 
   const settingsItems = [
     { icon: <User size={20} />, label: "Profile", description: "Personal info, email, phone", onClick: onOpenProfile },
-    { icon: <CreditCard size={20} />, label: "Card Management", description: "Lock card, report lost/stolen" },
-    { icon: <Shield size={20} />, label: "Security", description: "Password, Face ID, PIN" },
-    { icon: <Bell size={20} />, label: "Notifications", description: "Alerts, marketing preferences" },
-    { icon: <HelpCircle size={20} />, label: "Help & Support", description: "FAQ, contact us" },
-    { icon: <LogOut size={20} />, label: "Log Out", description: "" },
+    { icon: <CreditCard size={20} />, label: "Card Management", description: "Lock card, report lost/stolen", onClick: onOpenCard },
+    { icon: <Bell size={20} />, label: "Notifications", description: "Alerts, marketing preferences", onClick: onOpenNotifications },
+    { icon: <HelpCircle size={20} />, label: "Help & Support", description: "FAQ, contact us", onClick: onOpenSupport },
+    { icon: <LogOut size={20} />, label: "Log Out", description: "", onClick: onLogout },
   ];
 
   return (

@@ -1,0 +1,693 @@
+/* ============================
+   NorthOne Login Page Styles
+   Split-screen: Hero left + Form right
+   ============================ */
+
+.loginWrapper {
+  height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+}
+
+/* Animated background orbs */
+.bgOrb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0;
+  pointer-events: none;
+  display: none;
+}
+
+.bgOrb1 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #7ad37a, transparent);
+  top: -100px;
+  right: -100px;
+}
+
+.bgOrb2 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, #4caf50, transparent);
+  bottom: -80px;
+  left: -80px;
+}
+
+.bgOrb3 {
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, #81c784, transparent);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Floating particles */
+.particlesContainer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  display: none;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+}
+
+/* ===========================
+   Split layout container
+   =========================== */
+.splitContainer {
+  display: flex;
+  width: 100%;
+  max-width: 960px;
+  height: calc(100vh - 40px);
+  max-height: 720px;
+  border-radius: 28px;
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+/* ===========================
+   LEFT: Hero / Brand Panel
+   =========================== */
+.heroPanel {
+  flex: 1;
+  display: none; /* hidden on mobile */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 48px;
+  background: linear-gradient(170deg, #1b4332 0%, #2d6a4f 40%, #40916c 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle pattern overlay on the hero */
+.heroPanel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(122, 211, 122, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  justify-content: center;
+}
+
+.heroLogoCircle {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+.heroLogoImage {
+  border-radius: 50%;
+  object-fit: contain;
+}
+
+.heroBrandName {
+  font-size: 36px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.heroTagline {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 8px;
+  letter-spacing: 0.5px;
+  font-weight: 400;
+}
+
+.heroFeatures {
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.heroFeatureItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+  text-align: left;
+}
+
+.heroCheckmark {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(122, 211, 122, 0.2);
+  border: 1px solid rgba(122, 211, 122, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7ad37a;
+  flex-shrink: 0;
+}
+
+.heroFooter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
+  margin-top: 32px;
+}
+
+/* ===========================
+   RIGHT: Login Form Card
+   =========================== */
+.loginCard {
+  width: 100%;
+  max-width: 460px;
+  background: #ffffff;
+  padding: 48px 36px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+/* Logo area — visible on mobile only */
+.logoArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 36px;
+}
+
+.logoCircle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #f0faf0;
+  border: 2px solid #e0f0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(92, 184, 92, 0.15);
+}
+
+.logoImage {
+  border-radius: 50%;
+  object-fit: contain;
+}
+
+.brandName {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.brandTagline {
+  font-size: 13px;
+  color: #888888;
+  margin-top: 6px;
+  letter-spacing: 0.5px;
+  font-weight: 400;
+}
+
+/* Form header — hidden on mobile, shown on desktop */
+.formHeader {
+  display: none;
+  margin-bottom: 32px;
+}
+
+.formTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 6px 0;
+}
+
+.formSubtitle {
+  font-size: 14px;
+  color: #888888;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Form */
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inputGroup {
+  position: relative;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #b0b0b0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s ease;
+  z-index: 2;
+}
+
+.inputField {
+  width: 100%;
+  padding: 16px 16px 16px 48px;
+  background: #f8f9fa;
+  border: 1.5px solid #e2e5e9;
+  border-radius: 14px;
+  font-size: 15px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1a1a1a;
+  outline: none;
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+}
+
+.inputField::placeholder {
+  color: #a0a0a0;
+  font-weight: 400;
+}
+
+/* Select specific overrides */
+.selectField {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23a0a0a0%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  cursor: pointer;
+}
+
+.selectField:focus {
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%235cb85c%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+}
+
+.selectPlaceholder {
+  color: #a0a0a0;
+}
+
+.inputField:focus {
+  border-color: #5cb85c;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.12);
+}
+
+.inputField:focus ~ .inputIcon,
+.inputGroup:focus-within .inputIcon {
+  color: #5cb85c;
+}
+
+/* Password toggle */
+.passwordToggle {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #b0b0b0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: color 0.3s ease;
+  z-index: 2;
+}
+
+.passwordToggle:hover {
+  color: #666666;
+}
+
+/* Remember me & Forgot */
+.formOptions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -4px;
+}
+
+.rememberMe {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid #d0d0d0;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.checkboxChecked {
+  background: #5cb85c;
+  border-color: #5cb85c;
+}
+
+.rememberLabel {
+  font-size: 13px;
+  color: #777777;
+  font-weight: 400;
+  user-select: none;
+}
+
+.forgotLink {
+  font-size: 13px;
+  color: #5cb85c;
+  font-weight: 500;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  transition: color 0.2s ease;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.forgotLink:hover {
+  color: #43a047;
+  text-decoration: underline;
+}
+
+.termsLink {
+  color: #5cb85c;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.termsLink:hover {
+  color: #43a047;
+  text-decoration: underline;
+}
+
+/* Login button */
+.loginButton {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #5cb85c 0%, #4caf50 50%, #43a047 100%);
+  border: none;
+  border-radius: 14px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(92, 184, 92, 0.35);
+  margin-top: 4px;
+}
+
+.loginButton:hover {
+  box-shadow: 0 8px 32px rgba(92, 184, 92, 0.5);
+  transform: translateY(-1px);
+}
+
+.loginButton:active {
+  transform: translateY(0);
+}
+
+.loginButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Button shimmer effect */
+.buttonShimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.loginButton:hover .buttonShimmer {
+  left: 100%;
+}
+
+/* Loading spinner */
+.spinner {
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error message */
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 4px 0;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: #e8e8e8;
+}
+
+.dividerText {
+  font-size: 12px;
+  color: #aaaaaa;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+/* Create account button */
+.createAccountButton {
+  width: 100%;
+  padding: 15px;
+  background: transparent;
+  border: 1.5px solid #5cb85c;
+  border-radius: 14px;
+  color: #5cb85c;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+}
+
+.createAccountButton:hover {
+  background: #f0faf0;
+  border-color: #43a047;
+  box-shadow: 0 4px 20px rgba(92, 184, 92, 0.12);
+}
+
+/* Security badge */
+.securityBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 24px;
+  color: #b0b0b0;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+/* ===========================
+   RESPONSIVE: Mobile
+   =========================== */
+@media (max-width: 768px) {
+  .splitContainer {
+    max-width: 420px;
+    max-height: calc(100vh - 40px);
+    border-radius: 28px;
+  }
+
+  /* Hero panel hidden on mobile */
+  .heroPanel {
+    display: none;
+  }
+
+  /* Login card standalone on mobile */
+  .loginCard {
+    border-radius: 28px;
+    border: 1px solid #e8e8e8;
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.08),
+      0 0 0 1px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Show logo on mobile */
+  .logoArea {
+    display: flex;
+  }
+
+  /* Hide desktop welcome header on mobile */
+  .formHeader {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .loginCard {
+    padding: 36px 24px 32px;
+    border-radius: 24px;
+  }
+
+  .brandName {
+    font-size: 22px;
+  }
+
+  .splitContainer {
+    border-radius: 24px;
+  }
+}
+
+/* ===========================
+   RESPONSIVE: Desktop (≥769px)
+   =========================== */
+@media (min-width: 769px) {
+  .loginWrapper {
+    padding: 40px;
+  }
+
+  /* Show hero panel */
+  .heroPanel {
+    display: flex;
+  }
+
+  /* Hide mobile logo in the form card */
+  .logoArea {
+    display: none;
+  }
+
+  /* Show desktop welcome header */
+  .formHeader {
+    display: block;
+  }
+
+  .loginCard {
+    max-width: none;
+    flex: 1;
+    border-radius: 0;
+    border-left: 1px solid #eaeaea;
+  }
+
+  .splitContainer {
+    max-width: 960px;
+  }
+}
+
+/* ===========================
+   RESPONSIVE: Large Desktop
+   =========================== */
+@media (min-width: 1200px) {
+  .splitContainer {
+    max-width: 1060px;
+    max-height: 740px;
+  }
+
+  .heroPanel {
+    padding: 60px 56px;
+  }
+
+  .loginCard {
+    padding: 56px 48px;
+  }
+
+  .heroBrandName {
+    font-size: 40px;
+  }
+}

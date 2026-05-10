@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
+import { useBank } from '@/app/context/BankContext';
 import styles from './ProfilePage.module.css';
 
 interface ProfilePageProps {
@@ -24,11 +25,22 @@ export default function ProfilePage({ onBack, isTransferBlocked, onToggleTransfe
     }
   };
 
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').substring(0, 2);
+  const getInitials = (name?: string) => {
+    if (!name) return '';
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
 
-  const username = "Luke Charles Stafford";
+  const bank = useBank();
+  
+  const [editingField, setEditingField] = useState<'phone' | 'address' | null>(null);
+  const [editValue, setEditValue] = useState('');
+
+  const handleSave = () => {
+    if (editingField && bank.activeUser) {
+      bank.updateProfile(bank.activeUser.id, { [editingField]: editValue });
+    }
+    setEditingField(null);
+  };
 
   return (
     <motion.div 
@@ -48,9 +60,9 @@ export default function ProfilePage({ onBack, isTransferBlocked, onToggleTransfe
 
       <section className={styles.profileSection}>
         <div className={styles.avatar}>
-          {getInitials(username)}
+          {getInitials(bank.activeUser?.profileName)}
         </div>
-        <h2 className={styles.name}>{username}</h2>
+        <h2 className={styles.name}>{bank.activeUser?.profileName || 'Loading...'}</h2>
         <p className={styles.memberSince}>Member since April 2026</p>
       </section>
 
@@ -58,46 +70,52 @@ export default function ProfilePage({ onBack, isTransferBlocked, onToggleTransfe
         <div className={styles.detailItem}>
           <div>
             <div className={styles.detailLabel}>Email</div>
-            <div className={styles.detailValue}>luke.stafford@example.com</div>
+            <div className={styles.detailValue}>{bank.activeUser?.username || 'Loading...'}</div>
           </div>
           <button className={styles.editButton}>Edit</button>
         </div>
 
         <div className={styles.detailItem}>
-          <div>
+          <div style={{ flex: 1 }}>
             <div className={styles.detailLabel}>Phone Number</div>
-            <div className={styles.detailValue}>+1 (555) 123-4567</div>
+            {editingField === 'phone' ? (
+              <input 
+                value={editValue} 
+                onChange={(e) => setEditValue(e.target.value)} 
+                className={styles.editInput}
+                autoFocus
+              />
+            ) : (
+              <div className={styles.detailValue}>{bank.activeUser?.phone || 'Not provided'}</div>
+            )}
           </div>
-          <button className={styles.editButton}>Edit</button>
+          {editingField === 'phone' ? (
+            <button className={styles.editButton} onClick={handleSave}>Save</button>
+          ) : (
+            <button className={styles.editButton} onClick={() => { setEditingField('phone'); setEditValue(bank.activeUser?.phone || ''); }}>Edit</button>
+          )}
         </div>
 
         <div className={styles.detailItem}>
-          <div>
+          <div style={{ flex: 1 }}>
             <div className={styles.detailLabel}>Mailing Address</div>
-            <div className={styles.detailValue}>123 Green Dot Way<br/>Austin, TX 78701</div>
+            {editingField === 'address' ? (
+              <input 
+                value={editValue} 
+                onChange={(e) => setEditValue(e.target.value)} 
+                className={styles.editInput}
+                autoFocus
+              />
+            ) : (
+              <div className={styles.detailValue}>{bank.activeUser?.address || 'Not provided'}</div>
+            )}
           </div>
-          <button className={styles.editButton}>Edit</button>
+          {editingField === 'address' ? (
+            <button className={styles.editButton} onClick={handleSave}>Save</button>
+          ) : (
+            <button className={styles.editButton} onClick={() => { setEditingField('address'); setEditValue(bank.activeUser?.address || ''); }}>Edit</button>
+          )}
         </div>
-      </section>
-
-      <section className={styles.transferSection}>
-        <div className={styles.transferRow}>
-          <div className={styles.transferInfo}>
-            <div className={styles.transferLabel}>Block Transfers</div>
-            <div className={styles.transferDescription}>
-              When enabled, all outgoing transfers will be blocked.
-            </div>
-          </div>
-          <button 
-            className={`${styles.toggleSwitch} ${isTransferBlocked ? styles.toggleOn : styles.toggleOff}`}
-            onClick={onToggleTransfer}
-          >
-            <span className={`${styles.toggleKnob} ${isTransferBlocked ? styles.knobOn : styles.knobOff}`} />
-          </button>
-        </div>
-        <span className={`${styles.statusBadge} ${isTransferBlocked ? styles.statusBlocked : styles.statusActive}`}>
-          {isTransferBlocked ? '🔒 Transfers Blocked' : '✅ Transfers Allowed'}
-        </span>
       </section>
     </motion.div>
   );

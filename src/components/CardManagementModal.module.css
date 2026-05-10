@@ -1,0 +1,243 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal {
+  background: #f4f6f8;
+  width: 100%;
+  max-width: 500px;
+  min-height: 85vh;
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+  font-family: 'Inter', sans-serif;
+  padding-bottom: env(safe-area-inset-bottom, 30px);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #1a1a1a;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.cardContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+  perspective: 1000px;
+}
+
+.creditCard {
+  width: 320px;
+  height: 200px;
+  background: linear-gradient(135deg, #1a1a1a, #333);
+  border-radius: 16px;
+  padding: 24px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.lockedCard {
+  filter: grayscale(100%);
+  opacity: 0.9;
+}
+
+.lockedOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  backdrop-filter: blur(2px);
+  z-index: 10;
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bankName {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.chip {
+  width: 45px;
+  height: 35px;
+  background: linear-gradient(135deg, #e0c879, #bf953f);
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+.cardNumber {
+  font-family: 'Courier New', monospace;
+  font-size: 22px;
+  letter-spacing: 2px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  margin-top: 10px;
+}
+
+.cardBottom {
+  display: flex;
+  justify-content: space-between;
+  text-transform: uppercase;
+}
+
+.cardBottom span {
+  font-size: 8px;
+  opacity: 0.7;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.cardBottom div {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.actionsList {
+  background: #fff;
+  border-radius: 16px;
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.actionItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.actionItem:last-child {
+  border-bottom: none;
+}
+
+.actionInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.iconBox {
+  width: 40px;
+  height: 40px;
+  background: #f4f6f8;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.actionInfo h4 {
+  margin: 0 0 4px 0;
+  font-size: 15px;
+  color: #1a1a1a;
+}
+
+.actionInfo p {
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.toggleSwitch {
+  width: 50px;
+  height: 28px;
+  border-radius: 30px;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.toggleOn {
+  background-color: #d9534f;
+}
+
+.toggleOff {
+  background-color: #ddd;
+}
+
+.toggleKnob {
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  transition: transform 0.3s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.knobOn {
+  transform: translateX(24px);
+}
+
+.knobOff {
+  transform: translateX(2px);
+}
+
+.requestBtn {
+  background: #5cb85c;
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(92,184,92,0.2);
+  border-top-color: #5cb85c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
