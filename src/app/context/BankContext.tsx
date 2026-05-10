@@ -79,7 +79,7 @@ const BankContext = createContext<BankState>({} as BankState);
 export const BankProvider = ({ children }: { children: React.ReactNode }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [users, setUsers] = useState<UserAccount[]>([defaultInitialUser]);
-  const [activeUserId, setActiveUserId] = useState<string | null>('luke@example.com');
+  const [activeUserId, setActiveUserId] = useState<string | null>(null);
 
   const activeUser = users.find(u => u.id === activeUserId) || null;
 
