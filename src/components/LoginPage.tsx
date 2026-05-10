@@ -19,6 +19,7 @@ import {
   AlertCircle,
   Globe
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 interface LoginPageProps {
   onLoginSuccess: () => void;
@@ -55,18 +56,22 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
     setError('');
     if (!email.trim() || !password.trim()) { setError('Please enter your email and password.'); return; }
     
-    // Hardcoded check for Luke Skywalker
-    if (email.toLowerCase() === 'luke@example.com' && password !== 'Skywalker') {
-      setError('Invalid credentials.');
+    setIsLoading(true);
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
+      email: email.toLowerCase(),
+      password: password
+    });
+
+    setIsLoading(false);
+
+    if (authError) {
+      setError(authError.message);
       return;
     }
-
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1800));
-    setIsLoading(false);
     
-    bank.login(email.toLowerCase());
-    onLoginSuccess();
+    if (data.user) {
+      onLoginSuccess();
+    }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -79,11 +84,30 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
     if (password.length < 8) { setError('Password must be at least 8 characters.'); return; }
     if (password !== confirmPassword) { setError('Passwords do not match.'); return; }
     if (!agreeTerms) { setError('Please agree to the Terms & Conditions.'); return; }
+
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    const { data, error: authError } = await supabase.auth.signUp({
+      email: email.toLowerCase(),
+      password: password,
+      options: {
+        data: {
+          full_name: fullName,
+          country: country
+        }
+      }
+    });
+
     setIsLoading(false);
-    bank.createAccount(email.toLowerCase(), fullName, country);
-    onLoginSuccess();
+
+    if (authError) {
+      setError(authError.message);
+      return;
+    }
+
+    if (data.user) {
+      alert("Registration successful! Please check your email for verification (if enabled) or log in.");
+      switchMode('login');
+    }
   };
 
   const containerVariants = {
