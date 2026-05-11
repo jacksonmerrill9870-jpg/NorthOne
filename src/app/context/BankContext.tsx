@@ -149,6 +149,18 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
+  const sendEmail = async (to: string, subject: string, html: string) => {
+    try {
+      await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to, subject, html }),
+      });
+    } catch (error) {
+      console.error("Email error:", error);
+    }
+  };
+
   // Inactivity Timer (10 Minutes)
   useEffect(() => {
     if (!activeUserId) return;
@@ -268,6 +280,18 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
         alert: false
       });
 
+      // 4. Send Email
+      await sendEmail(user.username, "Transaction Successful - NorthOne Bank", `
+        <div style="font-family: sans-serif; padding: 20px; color: #111;">
+          <h2 style="color: #5cb85c;">Transaction Completed</h2>
+          <p>Hello <b>${user.profileName}</b>,</p>
+          <p>Your transaction of <b>$${amountToDeduct.toLocaleString()}</b> to <b>${merchantName}</b> was successful.</p>
+          <p>You have earned <b>$${cashback.toLocaleString()}</b> in Vault cashback!</p>
+          <br/>
+          <p>Thank you for choosing NorthOne.</p>
+        </div>
+      `);
+
       console.log("Transaction approved successfully");
       fetchData(); // Force refresh
     } catch (error) {
@@ -302,6 +326,18 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
         time: "Just now",
         alert: true
       });
+
+      // 3. Send Email
+      await sendEmail(user.username, "Transaction Declined - NorthOne Bank", `
+        <div style="font-family: sans-serif; padding: 20px; color: #111;">
+          <h2 style="color: #d9534f;">Transaction Declined</h2>
+          <p>Hello <b>${user.profileName}</b>,</p>
+          <p>Your transaction of <b>$${tx.amount.toLocaleString()}</b> to <b>${tx.merchant}</b> was declined by your bank.</p>
+          <p>No funds were deducted from your account.</p>
+          <br/>
+          <p>If you have questions, please contact support.</p>
+        </div>
+      `);
 
       console.log("Transaction declined successfully");
       fetchData(); // Force refresh
