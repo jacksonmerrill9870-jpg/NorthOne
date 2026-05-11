@@ -461,15 +461,22 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
 
   const deleteUser = async (userId: string) => {
     try {
-      // 1. Delete from profiles
+      // 1. Delete from profiles (Cascades to transactions/messages)
       const { error } = await supabase.from('profiles').delete().eq('id', userId);
       if (error) throw error;
 
-      console.log("User deleted successfully");
+      // 2. Delete from Supabase Auth (Permanent)
+      await fetch('/api/delete-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+
+      console.log("User deleted permanently from DB and Auth");
       fetchData();
     } catch (err) {
       console.error("Error deleting user:", err);
-      alert("Failed to delete user. They may have active transactions or messages preventing deletion.");
+      alert("Failed to delete user. Please try again.");
     }
   };
 
