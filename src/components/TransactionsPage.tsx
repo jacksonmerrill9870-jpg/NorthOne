@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ArrowDownLeft, ShoppingCart, Send, Trash2 } from 'lucide-react';
 import styles from './TransactionsPage.module.css';
+import TransactionReceiptModal from './TransactionReceiptModal';
 
 export interface TransactionItem {
   id: string;
@@ -31,6 +32,13 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 export default function TransactionsPage({ onBack, transactionGroups, onDeleteTransaction }: TransactionsPageProps) {
+  const [selectedTransaction, setSelectedTransaction] = React.useState<TransactionItem | null>(null);
+  const [isReceiptOpen, setIsReceiptOpen] = React.useState(false);
+
+  const handleTransactionClick = (item: TransactionItem) => {
+    setSelectedTransaction(item);
+    setIsReceiptOpen(true);
+  };
   const pageVariants = {
     hidden: { x: "100%", opacity: 0 },
     visible: { 
@@ -80,6 +88,7 @@ export default function TransactionsPage({ onBack, transactionGroups, onDeleteTr
                       animate={{ opacity: 1, height: 'auto', overflow: 'visible' }}
                       exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
                       transition={{ duration: 0.3 }}
+                      onClick={() => handleTransactionClick(item)}
                     >
                       <div className={styles.transactionLeft}>
                         <div className={`${styles.transactionIcon} ${item.type === 'deposit' ? styles.iconDeposit : styles.iconWithdrawal}`}>
@@ -98,7 +107,10 @@ export default function TransactionsPage({ onBack, transactionGroups, onDeleteTr
                       </div>
                       <button 
                         className={styles.deleteButton}
-                        onClick={() => onDeleteTransaction(item.id)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent opening receipt
+                          onDeleteTransaction(item.id);
+                        }}
                       >
                         <Trash2 size={16} />
                       </button>
@@ -110,6 +122,12 @@ export default function TransactionsPage({ onBack, transactionGroups, onDeleteTr
           ))
         )}
       </div>
+
+      <TransactionReceiptModal 
+        isOpen={isReceiptOpen}
+        onClose={() => setIsReceiptOpen(false)}
+        transaction={selectedTransaction}
+      />
     </motion.div>
   );
 }

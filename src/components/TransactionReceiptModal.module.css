@@ -1,0 +1,137 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.modal {
+  background-color: #fff;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.receiptHeader {
+  background: var(--card-gradient);
+  padding: 40px 20px;
+  text-align: center;
+  color: #fff;
+  position: relative;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.amount {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.merchant {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-top: 5px;
+}
+
+.receiptBody {
+  padding: 30px 20px;
+}
+
+.detailsList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.detailLabel {
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.detailValue {
+  font-size: 14px;
+  color: #111;
+  font-weight: 500;
+  text-align: right;
+  max-width: 60%;
+}
+
+.successColor {
+  color: #5cb85c;
+}
+
+.pendingColor {
+  color: #f0ad4e;
+}
+
+.footer {
+  padding: 20px;
+  border-top: 1px dashed #eee;
+  text-align: center;
+}
+
+.footerNote {
+  font-size: 11px;
+  color: #999;
+}
+
+.shareBtn {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--primary-green);
+  background: #fff;
+  color: var(--primary-green);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
