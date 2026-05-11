@@ -149,6 +149,35 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
+  // Inactivity Timer (10 Minutes)
+  useEffect(() => {
+    if (!activeUserId) return;
+
+    let timeoutId: any;
+
+    const resetTimer = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        console.log("Inactivity logout triggered");
+        logout();
+      }, 10 * 60 * 1000); // 10 Minutes
+    };
+
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(event => {
+      window.addEventListener(event, resetTimer);
+    });
+
+    resetTimer();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      events.forEach(event => {
+        window.removeEventListener(event, resetTimer);
+      });
+    };
+  }, [activeUserId]);
+
   const createAccount = async (email: string, fullName: string, country: string) => {
     // This is handled by supabase.auth.signUp in LoginPage
     console.log("Account creation handled by LoginPage");
