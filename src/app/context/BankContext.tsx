@@ -119,7 +119,14 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
         vaultBalance: parseFloat(p.vault_balance),
         cardNumber: p.card_number,
         transactions: groups,
-        messages: msgs || []
+        messages: (msgs || []).map((m: any) => ({
+          id: m.id,
+          iconType: m.icon_type,
+          title: m.title,
+          body: m.body,
+          time: m.time,
+          alert: m.alert
+        }))
       } as UserAccount;
     }));
 
