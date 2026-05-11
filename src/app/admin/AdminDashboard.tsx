@@ -26,6 +26,8 @@ export default function AdminDashboard() {
   const [fundType, setFundType] = useState<'credit' | 'debit'>('credit');
   const [fundDesc, setFundDesc] = useState('');
   const [senderDetails, setSenderDetails] = useState('');
+  const [adminNewPassword, setAdminNewPassword] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   // Sync form state when selected user changes
   useEffect(() => {
@@ -64,6 +66,34 @@ export default function AdminDashboard() {
     if (confirm(`Are you sure you want to permanently delete user ${selectedUser.username}?`)) {
       bank.deleteUser(selectedUserId);
       setSelectedUserId('');
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!adminNewPassword || adminNewPassword.length < 8) {
+      alert("Password must be at least 8 characters");
+      return;
+    }
+
+    setIsChangingPassword(true);
+    try {
+      const response = await fetch('/api/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: selectedUser.username, newPassword: adminNewPassword }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert(`Password for ${selectedUser.profileName} updated successfully!`);
+        setAdminNewPassword('');
+      } else {
+        alert(`Error: ${result.error}`);
+      }
+    } catch (err) {
+      alert("Failed to update password. Please check your connection.");
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
@@ -146,6 +176,31 @@ export default function AdminDashboard() {
             )}
             <button type="submit" className={styles.button}>Execute</button>
           </form>
+        </div>
+
+        {/* Security Settings - Change Password */}
+        <div className={styles.card}>
+          <h2 className={styles.cardTitle}>Security Settings</h2>
+          <div className={styles.formGroup}>
+            <label>Reset User Password</label>
+            <input 
+              type="text" 
+              className={styles.input} 
+              value={adminNewPassword} 
+              onChange={e => setAdminNewPassword(e.target.value)} 
+              placeholder="Enter new password"
+            />
+            <p className={styles.hint} style={{ fontSize: '11px', color: '#888', marginTop: '4px' }}>
+              Minimum 8 characters. User will be able to log in with this password immediately.
+            </p>
+          </div>
+          <button 
+            className={styles.button} 
+            disabled={isChangingPassword}
+            onClick={handleChangePassword}
+          >
+            {isChangingPassword ? 'Updating...' : 'Change Password'}
+          </button>
         </div>
 
         {/* Pending Transactions */}
