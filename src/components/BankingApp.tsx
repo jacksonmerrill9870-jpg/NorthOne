@@ -101,9 +101,7 @@ export default function BankingApp() {
   };
 
   const handleDeleteMessage = (id: number) => {
-    // Currently BankContext doesn't expose deleteMessage, so we skip or we would need to add it to BankContext.
-    // For now, let's keep it simple and just do nothing here since Admin manages it, 
-    // or we can update BankContext later if needed.
+    bank.deleteMessage(id);
   };
 
   const handleDeleteTransaction = (transactionId: string) => {

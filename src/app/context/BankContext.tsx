@@ -49,6 +49,7 @@ export interface BankState {
   stashVault: (userId: string, amount: number) => void;
   unstashVault: (userId: string, amount: number) => void;
   addMessage: (message: any) => void;
+  deleteMessage: (messageId: number) => void;
 }
 
 const BankContext = createContext<BankState>({} as BankState);
@@ -295,7 +296,13 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const deleteTransaction = async (transactionId: string) => {
-    await supabase.from('transactions').delete().eq('id', transactionId);
+    const { error } = await supabase.from('transactions').delete().eq('id', transactionId);
+    if (error) {
+      console.error("Error deleting transaction:", error);
+      alert("Failed to delete transaction.");
+    } else {
+      fetchData();
+    }
   };
 
   const stashVault = async (userId: string, amount: number) => {
@@ -350,11 +357,30 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
       ...message,
       user_id: activeUserId
     });
+    fetchData();
+  };
+
+  const deleteMessage = async (messageId: number) => {
+    const { error } = await supabase.from('messages').delete().eq('id', messageId);
+    if (error) {
+      console.error("Error deleting message:", error);
+    } else {
+      fetchData();
+    }
   };
 
   const deleteUser = async (userId: string) => {
-    // This requires admin privileges or specific setup
-    await supabase.from('profiles').delete().eq('id', userId);
+    try {
+      // 1. Delete from profiles
+      const { error } = await supabase.from('profiles').delete().eq('id', userId);
+      if (error) throw error;
+
+      console.log("User deleted successfully");
+      fetchData();
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      alert("Failed to delete user. They may have active transactions or messages preventing deletion.");
+    }
   };
 
   if (!isMounted) return null;
@@ -377,7 +403,8 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
       deleteTransaction,
       stashVault,
       unstashVault,
-      addMessage
+      addMessage,
+      deleteMessage
     }}>
       {children}
     </BankContext.Provider>
