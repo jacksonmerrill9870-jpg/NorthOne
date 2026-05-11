@@ -27,7 +27,7 @@ interface LoginPageProps {
 
 export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
   const bank = useBank();
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -46,7 +46,7 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
     setError(''); setAgreeTerms(false);
   };
 
-  const switchMode = (newMode: 'login' | 'signup') => {
+  const switchMode = (newMode: 'login' | 'signup' | 'forgot') => {
     clearForm();
     setMode(newMode);
   };
@@ -107,6 +107,38 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
     if (data.user) {
       alert("Registration successful! Please check your email for verification (if enabled) or log in.");
       switchMode('login');
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    if (!email.trim()) { setError('Please enter your email.'); return; }
+    if (!password.trim()) { setError('Please enter a new password.'); return; }
+    if (password.length < 8) { setError('Password must be at least 8 characters.'); return; }
+    if (password !== confirmPassword) { setError('Passwords do not match.'); return; }
+
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch('/api/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.toLowerCase(), newPassword: password }),
+      });
+
+      const result = await response.json();
+      setIsLoading(false);
+
+      if (response.ok) {
+        alert("Password updated successfully! You can now log in with your new password.");
+        switchMode('login');
+      } else {
+        setError(result.error || "Failed to reset password. Please try again.");
+      }
+    } catch (err) {
+      setIsLoading(false);
+      setError("An error occurred. Please try again.");
     }
   };
 
@@ -184,7 +216,7 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
             </div>
             <span className={styles.rememberLabel}>Remember me</span>
           </div>
-          <button type="button" className={styles.forgotLink}>Forgot password?</button>
+          <button type="button" className={styles.forgotLink} onClick={() => switchMode('forgot')}>Forgot password?</button>
         </div>
         <motion.button type="submit" className={styles.loginButton} disabled={isLoading} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           {isLoading ? <span className={styles.spinner} /> : <>Sign In<span className={styles.buttonShimmer} /></>}
@@ -192,6 +224,50 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
         <div className={styles.divider}><div className={styles.dividerLine} /><span className={styles.dividerText}>or</span><div className={styles.dividerLine} /></div>
         <motion.button type="button" className={styles.createAccountButton} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => switchMode('signup')}>
           <UserPlus size={18} />Create New Account
+        </motion.button>
+      </form>
+    </motion.div>
+  );
+
+  const renderForgotForm = () => (
+    <motion.div key="forgot" {...formTransition}>
+      <form className={styles.loginForm} onSubmit={handleResetPassword}>
+        <div className={styles.backToLoginArea}>
+          <button type="button" className={styles.backLink} onClick={() => switchMode('login')}>
+            <ArrowLeft size={16} /> Back to Sign In
+          </button>
+        </div>
+        <h2 className={styles.formTitle} style={{ marginTop: '10px' }}>Reset Password</h2>
+        <p className={styles.formSubtitle}>Enter your email and a new password below</p>
+        
+        {renderError()}
+        
+        <div className={styles.inputGroup}>
+          <div className={styles.inputIcon}><Mail size={18} /></div>
+          <input id="reset-email" type="email" className={styles.inputField} placeholder="Account Email"
+            value={email} onChange={(e) => { setEmail(e.target.value); setError(''); }} autoComplete="email" />
+        </div>
+        
+        <div className={styles.inputGroup}>
+          <div className={styles.inputIcon}><Lock size={18} /></div>
+          <input id="reset-password" type={showPassword ? 'text' : 'password'} className={styles.inputField}
+            placeholder="New Password" value={password} onChange={(e) => { setPassword(e.target.value); setError(''); }} />
+          <button type="button" className={styles.passwordToggle} onClick={() => setShowPassword(!showPassword)}>
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
+
+        <div className={styles.inputGroup}>
+          <div className={styles.inputIcon}><Lock size={18} /></div>
+          <input id="reset-confirm" type={showConfirmPassword ? 'text' : 'password'} className={styles.inputField}
+            placeholder="Confirm New Password" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); setError(''); }} />
+          <button type="button" className={styles.passwordToggle} onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
+
+        <motion.button type="submit" className={styles.loginButton} disabled={isLoading} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          {isLoading ? <span className={styles.spinner} /> : <>Reset Password<span className={styles.buttonShimmer} /></>}
         </motion.button>
       </form>
     </motion.div>
@@ -298,7 +374,7 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
           transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}>
           {renderFormHeader()}
           <AnimatePresence mode="wait">
-            {mode === 'login' ? renderLoginForm() : renderSignupForm()}
+            {mode === 'login' ? renderLoginForm() : (mode === 'signup' ? renderSignupForm() : renderForgotForm())}
           </AnimatePresence>
           <motion.div className={styles.securityBadge} variants={itemVariants}>
             <ShieldCheck size={14} /><span>256-bit SSL Encrypted</span>
