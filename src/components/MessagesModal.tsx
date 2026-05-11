@@ -87,7 +87,7 @@ export default function MessagesModal({ isOpen, onClose, messages, onDeleteMessa
                   {messages.map((msg) => (
                     <motion.div 
                       key={msg.id} 
-                      className={styles.messageItem}
+                      className={`${styles.messageItem} ${msg.iconType === 'error' ? styles.itemError : ''}`}
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
@@ -97,7 +97,7 @@ export default function MessagesModal({ isOpen, onClose, messages, onDeleteMessa
                         {renderIcon(msg.iconType)}
                       </div>
                       <div className={styles.messageText}>
-                        <div className={styles.messageTitle}>{msg.title}</div>
+                        <div className={`${styles.messageTitle} ${msg.iconType === 'error' ? styles.titleError : ''}`}>{msg.title}</div>
                         <div className={styles.messageBody}>{msg.body}</div>
                         <div className={styles.messageTime}>{msg.time}</div>
                       </div>

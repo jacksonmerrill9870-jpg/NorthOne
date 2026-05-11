@@ -113,6 +113,17 @@
   margin-bottom: 4px;
 }
 
+.titleError {
+  color: #d32f2f;
+}
+
+.itemError {
+  background-color: rgba(217, 83, 79, 0.03);
+  margin: 0 -20px;
+  padding: 16px 20px;
+  border-left: 4px solid #d9534f;
+}
+
 .messageBody {
   font-size: 13px;
   color: var(--text-secondary);
