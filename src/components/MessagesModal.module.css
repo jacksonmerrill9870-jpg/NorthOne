@@ -77,21 +77,29 @@
   border-bottom: none;
 }
 
-.iconWrapper {
+.messageIcon {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #f0fcf0;
+  background-color: #f5f5f5;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary-green);
+  color: var(--white);
   flex-shrink: 0;
 }
 
+.iconSuccess {
+  background-color: var(--primary-green);
+}
+
+.iconError {
+  background-color: #d9534f;
+  box-shadow: 0 0 10px rgba(217, 83, 79, 0.4);
+}
+
 .iconAlert {
-  background-color: #fff3e0;
-  color: #ed6c02;
+  background-color: #f0ad4e;
 }
 
 .messageText {

@@ -93,7 +93,7 @@ export default function MessagesModal({ isOpen, onClose, messages, onDeleteMessa
                       exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
                       transition={{ duration: 0.2 }}
                     >
-                      <div className={`${styles.messageIcon} ${msg.alert ? styles.iconAlert : ''}`}>
+                      <div className={`${styles.messageIcon} ${msg.iconType === 'success' ? styles.iconSuccess : ''} ${msg.iconType === 'error' ? styles.iconError : ''} ${msg.iconType === 'alert' ? styles.iconAlert : ''}`}>
                         {renderIcon(msg.iconType)}
                       </div>
                       <div className={styles.messageText}>
