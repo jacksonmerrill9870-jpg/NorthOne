@@ -24,7 +24,7 @@ export default function TransactionReceiptModal({ isOpen, onClose, transaction }
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             onClick={e => e.stopPropagation()}
           >
-            <div className={styles.receiptHeader}>
+            <div className={`${styles.receiptHeader} ${transaction.category === 'Failed' ? styles.receiptHeaderError : ''}`}>
               <button className={styles.closeBtn} onClick={onClose}><X size={18} /></button>
               <div className={styles.statusBadge}>
                 {transaction.pending ? 'Pending' : (transaction.category === 'Failed' ? 'Declined' : 'Completed')}

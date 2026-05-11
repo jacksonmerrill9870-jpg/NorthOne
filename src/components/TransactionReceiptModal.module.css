@@ -31,6 +31,14 @@
   position: relative;
 }
 
+.receiptHeaderError {
+  background: linear-gradient(135deg, #d9534f 0%, #c9302c 100%);
+  padding: 40px 20px;
+  text-align: center;
+  color: #fff;
+  position: relative;
+}
+
 .closeBtn {
   position: absolute;
   top: 15px;
