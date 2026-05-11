@@ -56,7 +56,20 @@ const BankContext = createContext<BankState>({} as BankState);
 
 export const BankProvider = ({ children }: { children: React.ReactNode }) => {
   const [isMounted, setIsMounted] = useState(false);
-  const [users, setUsers] = useState<UserAccount[]>([]);
+  const [users, setUsers] = useState<UserAccount[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('northone_users_cache');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+
+  // Save cache when users update
+  useEffect(() => {
+    if (users.length > 0) {
+      localStorage.setItem('northone_users_cache', JSON.stringify(users));
+    }
+  }, [users]);
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const [session, setSession] = useState<Session | null>(null);
 
@@ -82,26 +95,30 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const fetchData = async () => {
-    // 1. Fetch Profiles
-    const { data: profiles, error: pError } = await supabase
-      .from('profiles')
-      .select('*');
-
-    if (pError) {
+    // 1. Fetch all Profiles
+    const { data: profiles, error: pError } = await supabase.from('profiles').select('*');
+    if (pError || !profiles) {
       console.error("Error fetching profiles:", pError);
       return;
     }
 
-    // 2. Fetch Transactions & Messages for all fetched profiles
-    const enrichedUsers = await Promise.all(profiles.map(async (p: any) => {
-      const { data: txs } = await supabase.from('transactions').select('*').eq('user_id', p.id).order('created_at', { ascending: false });
-      const { data: msgs } = await supabase.from('messages').select('*').eq('user_id', p.id).order('created_at', { ascending: false });
+    const profileIds = profiles.map(p => p.id);
 
-      // Group transactions by date (simplified: just group today vs others)
+    // 2. Fetch ALL transactions and messages for these profiles in just 2 calls (Batch Fetching)
+    const [ { data: allTxs }, { data: allMsgs } ] = await Promise.all([
+      supabase.from('transactions').select('*').in('user_id', profileIds).order('created_at', { ascending: false }),
+      supabase.from('messages').select('*').in('user_id', profileIds).order('created_at', { ascending: false })
+    ]);
+
+    // 3. Map everything in memory (Super Fast)
+    const enrichedUsers = profiles.map((p: any) => {
+      const userTxs = (allTxs || []).filter((t: any) => t.user_id === p.id);
+      const userMsgs = (allMsgs || []).filter((m: any) => m.user_id === p.id);
+
       const groups: TransactionGroup[] = [];
-      if (txs && txs.length > 0) {
-        const today = txs.filter((t: any) => t.date === 'Today');
-        const others = txs.filter((t: any) => t.date !== 'Today');
+      if (userTxs.length > 0) {
+        const today = userTxs.filter((t: any) => t.date === 'Today');
+        const others = userTxs.filter((t: any) => t.date !== 'Today');
         if (today.length > 0) groups.push({ id: 1, date: 'Today', items: today });
         if (others.length > 0) groups.push({ id: 2, date: 'Other', items: others });
       }
@@ -119,7 +136,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
         vaultBalance: parseFloat(p.vault_balance),
         cardNumber: p.card_number,
         transactions: groups,
-        messages: (msgs || []).map((m: any) => ({
+        messages: userMsgs.map((m: any) => ({
           id: m.id,
           iconType: m.icon_type,
           title: m.title,
@@ -128,7 +145,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
           alert: m.alert
         }))
       } as UserAccount;
-    }));
+    });
 
     setUsers(enrichedUsers);
   };
