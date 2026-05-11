@@ -152,6 +152,9 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const verifyAccount = async (userId: string) => {
+    // Optimistic update
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, isVerified: true } : u));
+    
     await supabase.from('profiles').update({ is_verified: true }).eq('id', userId);
   };
 

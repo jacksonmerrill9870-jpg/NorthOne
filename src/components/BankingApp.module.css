@@ -34,6 +34,40 @@
   position: relative;
 }
 
+.balanceHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.userUniqueId {
+  font-size: 11px;
+  opacity: 0.7;
+  font-weight: 400;
+}
+
+.balanceAccount {
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
 .balanceLabel {
   font-size: 14px;
   font-weight: 500;
