@@ -231,6 +231,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     await supabase.auth.signOut();
+    localStorage.removeItem('northone_users_cache');
     setActiveUserId(null);
   };
 
@@ -459,6 +460,21 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const clearUserData = async (userId: string) => {
+    try {
+      // Delete all transactions for this user
+      await supabase.from('transactions').delete().eq('user_id', userId);
+      // Delete all messages/notifications for this user
+      await supabase.from('messages').delete().eq('user_id', userId);
+      
+      console.log("User data cleared successfully");
+      fetchData();
+    } catch (err) {
+      console.error("Error clearing user data:", err);
+      alert("Failed to clear data.");
+    }
+  };
+
   const deleteUser = async (userId: string) => {
     try {
       // 1. Delete from profiles (Cascades to transactions/messages)
@@ -496,6 +512,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
       approveTransaction,
       declineTransaction,
       deleteUser,
+      clearUserData,
       addTransaction,
       deleteTransaction,
       stashVault,

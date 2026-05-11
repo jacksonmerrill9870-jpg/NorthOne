@@ -140,6 +140,17 @@ export default function AdminDashboard() {
             <div style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
               <button 
                 className={styles.button} 
+                style={{ backgroundColor: '#f0ad4e', color: '#fff', width: '100%', marginBottom: '10px' }}
+                onClick={() => {
+                  if (confirm(`Are you sure you want to clear ALL transaction history and messages for ${selectedUser.profileName}? This cannot be undone.`)) {
+                    bank.clearUserData(selectedUser.id);
+                  }
+                }}
+              >
+                Clear History & Messages
+              </button>
+              <button 
+                className={styles.button} 
                 style={{ backgroundColor: '#d9534f', color: '#fff', width: '100%' }}
                 onClick={handleDeleteUser}
               >
