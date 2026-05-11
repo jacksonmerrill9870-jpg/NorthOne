@@ -138,33 +138,17 @@ export default function AdminDashboard() {
               <button className={`${styles.button} ${selectedUser.status === 'frozen' ? styles.frozen : ''}`} onClick={() => handleStatusChange('frozen')}>Frozen</button>
             </div>
           </div>
+          <div style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
+            <button 
+              className={styles.button} 
+              style={{ backgroundColor: '#d9534f', color: '#fff', width: '100%', fontWeight: 'bold' }}
+              onClick={handleDeleteUser}
+            >
+              Permanently Delete User
+            </button>
+          </div>
         </div>
 
-        {/* Account Maintenance */}
-        <div className={styles.card}>
-          <h2 className={styles.cardTitle}>Account Maintenance</h2>
-          <p className={styles.hint} style={{ fontSize: '13px', color: '#666', marginBottom: '20px' }}>
-            DANGER ZONE: These actions are permanent and cannot be undone.
-          </p>
-          <button 
-            className={styles.button} 
-            style={{ backgroundColor: '#f0ad4e', color: '#fff', width: '100%', marginBottom: '12px', fontWeight: 'bold' }}
-            onClick={() => {
-              if (confirm(`Are you sure you want to clear ALL transaction history and messages for ${selectedUser.profileName}?`)) {
-                bank.clearUserData(selectedUser.id);
-              }
-            }}
-          >
-            Clear All History & Messages
-          </button>
-          <button 
-            className={styles.button} 
-            style={{ backgroundColor: '#d9534f', color: '#fff', width: '100%', fontWeight: 'bold' }}
-            onClick={handleDeleteUser}
-          >
-            Permanently Delete User
-          </button>
-        </div>
 
         {/* Add/Remove Funds */}
         <div className={styles.card}>
@@ -218,6 +202,20 @@ export default function AdminDashboard() {
           >
             {isChangingPassword ? 'Updating...' : 'Change Password'}
           </button>
+          
+          <div style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
+            <button 
+              className={styles.button} 
+              style={{ backgroundColor: '#f0ad4e', color: '#fff', width: '100%', fontWeight: 'bold' }}
+              onClick={() => {
+                if (confirm(`Are you sure you want to clear ALL transaction history and messages for ${selectedUser.profileName}?`)) {
+                  bank.clearUserData(selectedUser.id);
+                }
+              }}
+            >
+              Clear All History & Messages
+            </button>
+          </div>
         </div>
 
         {/* Pending Transactions */}
