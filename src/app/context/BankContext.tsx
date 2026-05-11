@@ -209,24 +209,34 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
     const merchantName = tx.merchant;
     const cashback = amountToDeduct * 0.02;
 
-    // Update transaction
-    await supabase.from('transactions').update({ pending: false }).eq('id', transactionId);
+    try {
+      // 1. Update transaction status
+      const { error: txError } = await supabase.from('transactions').update({ pending: false }).eq('id', transactionId);
+      if (txError) throw txError;
 
-    // Update balance and vault
-    await supabase.from('profiles').update({ 
-      balance: user.balance - amountToDeduct,
-      vault_balance: user.vaultBalance + cashback
-    }).eq('id', userId);
+      // 2. Update balance and vault
+      const { error: pError } = await supabase.from('profiles').update({ 
+        balance: user.balance - amountToDeduct,
+        vault_balance: user.vaultBalance + cashback
+      }).eq('id', userId);
+      if (pError) throw pError;
 
-    // Add message
-    await supabase.from('messages').insert({
-      user_id: userId,
-      icon_type: 'success',
-      title: "Transaction Completed",
-      body: `Your transaction of $${amountToDeduct.toLocaleString('en-US', {minimumFractionDigits: 2})} to ${merchantName} was successfully completed. You earned $${cashback.toLocaleString('en-US', {minimumFractionDigits: 2})} in Vault cashback!`,
-      time: "Just now",
-      alert: false
-    });
+      // 3. Add success message
+      await supabase.from('messages').insert({
+        user_id: userId,
+        icon_type: 'success',
+        title: "Transaction Completed",
+        body: `Your transaction of $${amountToDeduct.toLocaleString('en-US', {minimumFractionDigits: 2})} to ${merchantName} was successfully completed. You earned $${cashback.toLocaleString('en-US', {minimumFractionDigits: 2})} in Vault cashback!`,
+        time: "Just now",
+        alert: false
+      });
+
+      console.log("Transaction approved successfully");
+      fetchData(); // Force refresh
+    } catch (error) {
+      console.error("Error approving transaction:", error);
+      alert("Failed to approve transaction. See console for details.");
+    }
   };
 
   const declineTransaction = async (userId: string, transactionId: string) => {
@@ -237,21 +247,30 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
     const tx = txs.find(t => t.id === transactionId);
     if (!tx) return;
 
-    // Update transaction
-    await supabase.from('transactions').update({ 
-      pending: false,
-      merchant: tx.merchant + ' (Declined)'
-    }).eq('id', transactionId);
+    try {
+      // 1. Update transaction to declined state
+      const { error: txError } = await supabase.from('transactions').update({ 
+        pending: false,
+        merchant: tx.merchant + ' (Declined)'
+      }).eq('id', transactionId);
+      if (txError) throw txError;
 
-    // Add message
-    await supabase.from('messages').insert({
-      user_id: userId,
-      icon_type: 'error',
-      title: "Transaction Failed",
-      body: `Your transaction of $${tx.amount.toLocaleString('en-US', {minimumFractionDigits: 2})} to ${tx.merchant} failed and was declined by your bank.`,
-      time: "Just now",
-      alert: true
-    });
+      // 2. Add error message for user
+      await supabase.from('messages').insert({
+        user_id: userId,
+        icon_type: 'error',
+        title: "Transaction Failed",
+        body: `Your transaction of $${tx.amount.toLocaleString('en-US', {minimumFractionDigits: 2})} to ${tx.merchant} failed and was declined by your bank.`,
+        time: "Just now",
+        alert: true
+      });
+
+      console.log("Transaction declined successfully");
+      fetchData(); // Force refresh
+    } catch (error) {
+      console.error("Error declining transaction:", error);
+      alert("Failed to decline transaction. See console for details.");
+    }
   };
 
   const addTransaction = async (transaction: any) => {
