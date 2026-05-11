@@ -80,53 +80,53 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch all users (for admin) and current user data
-  useEffect(() => {
-    const fetchData = async () => {
-      // 1. Fetch Profiles
-      const { data: profiles, error: pError } = await supabase
-        .from('profiles')
-        .select('*');
+  const fetchData = async () => {
+    // 1. Fetch Profiles
+    const { data: profiles, error: pError } = await supabase
+      .from('profiles')
+      .select('*');
 
-      if (pError) {
-        console.error("Error fetching profiles:", pError);
-        return;
+    if (pError) {
+      console.error("Error fetching profiles:", pError);
+      return;
+    }
+
+    // 2. Fetch Transactions & Messages for all fetched profiles
+    const enrichedUsers = await Promise.all(profiles.map(async (p: any) => {
+      const { data: txs } = await supabase.from('transactions').select('*').eq('user_id', p.id).order('created_at', { ascending: false });
+      const { data: msgs } = await supabase.from('messages').select('*').eq('user_id', p.id).order('created_at', { ascending: false });
+
+      // Group transactions by date (simplified: just group today vs others)
+      const groups: TransactionGroup[] = [];
+      if (txs && txs.length > 0) {
+        const today = txs.filter((t: any) => t.date === 'Today');
+        const others = txs.filter((t: any) => t.date !== 'Today');
+        if (today.length > 0) groups.push({ id: 1, date: 'Today', items: today });
+        if (others.length > 0) groups.push({ id: 2, date: 'Other', items: others });
       }
 
-      // 2. Fetch Transactions & Messages for all fetched profiles
-      const enrichedUsers = await Promise.all(profiles.map(async (p: any) => {
-        const { data: txs } = await supabase.from('transactions').select('*').eq('user_id', p.id).order('created_at', { ascending: false });
-        const { data: msgs } = await supabase.from('messages').select('*').eq('user_id', p.id).order('created_at', { ascending: false });
+      return {
+        id: p.id,
+        username: p.email,
+        profileName: p.profile_name,
+        country: p.country,
+        phone: p.phone,
+        address: p.address,
+        isVerified: p.is_verified || (typeof window !== 'undefined' && localStorage.getItem(`verified_${p.id}`) === 'true'),
+        status: p.status as UserStatus,
+        balance: parseFloat(p.balance),
+        vaultBalance: parseFloat(p.vault_balance),
+        cardNumber: p.card_number,
+        transactions: groups,
+        messages: msgs || []
+      } as UserAccount;
+    }));
 
-        // Group transactions by date (simplified: just group today vs others)
-        const groups: TransactionGroup[] = [];
-        if (txs && txs.length > 0) {
-          const today = txs.filter((t: any) => t.date === 'Today');
-          const others = txs.filter((t: any) => t.date !== 'Today');
-          if (today.length > 0) groups.push({ id: 1, date: 'Today', items: today });
-          if (others.length > 0) groups.push({ id: 2, date: 'Other', items: others });
-        }
+    setUsers(enrichedUsers);
+  };
 
-        return {
-          id: p.id,
-          username: p.email,
-          profileName: p.profile_name,
-          country: p.country,
-          phone: p.phone,
-          address: p.address,
-          isVerified: p.is_verified || (typeof window !== 'undefined' && localStorage.getItem(`verified_${p.id}`) === 'true'),
-          status: p.status as UserStatus,
-          balance: parseFloat(p.balance),
-          vaultBalance: parseFloat(p.vault_balance),
-          cardNumber: p.card_number,
-          transactions: groups,
-          messages: msgs || []
-        } as UserAccount;
-      }));
-
-      setUsers(enrichedUsers);
-    };
-
+  // Fetch all users (for admin) and current user data
+  useEffect(() => {
     fetchData();
 
     // Set up real-time subscription for profiles, transactions, and messages
@@ -155,7 +155,12 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
     // Optimistic update
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, isVerified: true } : u));
     
-    await supabase.from('profiles').update({ is_verified: true }).eq('id', userId);
+    const { error } = await supabase.from('profiles').update({ is_verified: true }).eq('id', userId);
+    if (error) {
+      console.error("Error verifying account:", error);
+    } else {
+      fetchData(); // Refresh to be sure
+    }
   };
 
   const logout = async () => {
@@ -251,11 +256,23 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
 
   const addTransaction = async (transaction: any) => {
     if (!activeUserId) return;
-    await supabase.from('transactions').insert({
-      ...transaction,
+    
+    // Remove client-side temp ID so Supabase can generate a valid UUID
+    const { id, ...txData } = transaction;
+    
+    const { error } = await supabase.from('transactions').insert({
+      ...txData,
       user_id: activeUserId,
       date: 'Today'
     });
+
+    if (error) {
+      console.error("Error adding transaction:", error);
+      alert("Failed to record transaction. Please check your connection.");
+    } else {
+      console.log("Transaction recorded successfully");
+      fetchData(); // Trigger refresh
+    }
   };
 
   const deleteTransaction = async (transactionId: string) => {
