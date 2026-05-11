@@ -301,19 +301,47 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
   const stashVault = async (userId: string, amount: number) => {
     const user = users.find(u => u.id === userId);
     if (!user) return;
-    await supabase.from('profiles').update({ 
-      balance: user.balance - amount, 
-      vault_balance: user.vaultBalance + amount 
-    }).eq('id', userId);
+
+    // Optimistic Update
+    const newBalance = user.balance - amount;
+    const newVaultBalance = user.vaultBalance + amount;
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, balance: newBalance, vaultBalance: newVaultBalance } : u));
+
+    try {
+      const { error } = await supabase.from('profiles').update({ 
+        balance: newBalance, 
+        vault_balance: newVaultBalance 
+      }).eq('id', userId);
+      
+      if (error) throw error;
+      fetchData(); // Confirm with server
+    } catch (err) {
+      console.error("Stash error:", err);
+      fetchData(); // Revert to server state
+    }
   };
 
   const unstashVault = async (userId: string, amount: number) => {
     const user = users.find(u => u.id === userId);
     if (!user) return;
-    await supabase.from('profiles').update({ 
-      balance: user.balance + amount, 
-      vault_balance: user.vaultBalance - amount 
-    }).eq('id', userId);
+
+    // Optimistic Update
+    const newBalance = user.balance + amount;
+    const newVaultBalance = user.vaultBalance - amount;
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, balance: newBalance, vaultBalance: newVaultBalance } : u));
+
+    try {
+      const { error } = await supabase.from('profiles').update({ 
+        balance: newBalance, 
+        vault_balance: newVaultBalance 
+      }).eq('id', userId);
+
+      if (error) throw error;
+      fetchData(); // Confirm with server
+    } catch (err) {
+      console.error("Unstash error:", err);
+      fetchData(); // Revert to server state
+    }
   };
 
   const addMessage = async (message: any) => {
