@@ -79,6 +79,8 @@ export default function VerificationModal({ isOpen, onComplete }: VerificationMo
 
     // 2. Immediate Bypass
     if (user) {
+      // Save to localStorage as a persistent backup bypass
+      localStorage.setItem(`verified_${user.id}`, 'true');
       bank.verifyAccount(user.id);
     }
     

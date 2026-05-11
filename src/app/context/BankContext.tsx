@@ -114,7 +114,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
           country: p.country,
           phone: p.phone,
           address: p.address,
-          isVerified: p.is_verified,
+          isVerified: p.is_verified || (typeof window !== 'undefined' && localStorage.getItem(`verified_${p.id}`) === 'true'),
           status: p.status as UserStatus,
           balance: parseFloat(p.balance),
           vaultBalance: parseFloat(p.vault_balance),
