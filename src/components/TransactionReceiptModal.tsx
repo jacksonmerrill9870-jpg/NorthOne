@@ -27,7 +27,7 @@ export default function TransactionReceiptModal({ isOpen, onClose, transaction }
             <div className={styles.receiptHeader}>
               <button className={styles.closeBtn} onClick={onClose}><X size={18} /></button>
               <div className={styles.statusBadge}>
-                {transaction.pending ? 'Pending' : 'Completed'}
+                {transaction.pending ? 'Pending' : (transaction.category === 'Failed' ? 'Declined' : 'Completed')}
               </div>
               <h2 className={styles.amount}>
                 {transaction.type === 'deposit' ? '+' : '-'}${Math.abs(transaction.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -39,8 +39,8 @@ export default function TransactionReceiptModal({ isOpen, onClose, transaction }
               <div className={styles.detailsList}>
                 <div className={styles.detailRow}>
                   <span className={styles.detailLabel}>Status</span>
-                  <span className={`${styles.detailValue} ${transaction.pending ? styles.pendingColor : styles.successColor}`}>
-                    {transaction.pending ? 'Payment Processing' : 'Transaction Successful'}
+                  <span className={`${styles.detailValue} ${transaction.pending ? styles.pendingColor : (transaction.category === 'Failed' ? styles.errorColor : styles.successColor)}`}>
+                    {transaction.pending ? 'Payment Processing' : (transaction.category === 'Failed' ? 'Transaction Declined' : 'Transaction Successful')}
                   </span>
                 </div>
                 

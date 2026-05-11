@@ -109,6 +109,10 @@
   color: #f0ad4e;
 }
 
+.errorColor {
+  color: #d9534f;
+}
+
 .footer {
   padding: 20px;
   border-top: 1px dashed #eee;

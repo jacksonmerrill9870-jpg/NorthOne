@@ -252,6 +252,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
       // 1. Update transaction to declined state
       const { error: txError } = await supabase.from('transactions').update({ 
         pending: false,
+        category: 'Failed',
         merchant: tx.merchant + ' (Declined)'
       }).eq('id', transactionId);
       if (txError) throw txError;
