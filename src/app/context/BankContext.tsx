@@ -29,7 +29,7 @@ export interface BankState {
   users: UserAccount[];
   activeUserId: string | null;
   activeUser: UserAccount | null;
-  
+
   // Auth
   createAccount: (email: string, fullName: string, country: string) => void;
   login: (email: string) => void;
@@ -105,7 +105,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
     const profileIds = profiles.map(p => p.id);
 
     // 2. Fetch ALL transactions and messages for these profiles in just 2 calls (Batch Fetching)
-    const [ { data: allTxs }, { data: allMsgs } ] = await Promise.all([
+    const [{ data: allTxs }, { data: allMsgs }] = await Promise.all([
       supabase.from('transactions').select('*').in('user_id', profileIds).order('created_at', { ascending: false }),
       supabase.from('messages').select('*').in('user_id', profileIds).order('created_at', { ascending: false })
     ]);
@@ -220,7 +220,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
   const verifyAccount = async (userId: string) => {
     // Optimistic update
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, isVerified: true } : u));
-    
+
     const { error } = await supabase.from('profiles').update({ is_verified: true }).eq('id', userId);
     if (error) {
       console.error("Error verifying account:", error);
@@ -239,7 +239,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
     const dbUpdates: any = {};
     if (updates.profileName) dbUpdates.profile_name = updates.profileName;
     if (updates.status) dbUpdates.status = updates.status;
-    
+
     await supabase.from('profiles').update(dbUpdates).eq('id', userId);
   };
 
@@ -248,7 +248,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
     if (!user) return;
 
     const newBalance = type === 'credit' ? user.balance + amount : user.balance - amount;
-    
+
     // Update balance
     await supabase.from('profiles').update({ balance: newBalance }).eq('id', userId);
 
@@ -282,7 +282,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
       if (txError) throw txError;
 
       // 2. Update balance and vault
-      const { error: pError } = await supabase.from('profiles').update({ 
+      const { error: pError } = await supabase.from('profiles').update({
         balance: user.balance - amountToDeduct,
         vault_balance: user.vaultBalance + cashback
       }).eq('id', userId);
@@ -293,7 +293,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
         user_id: userId,
         icon_type: 'success',
         title: "Transaction Completed",
-        body: `Your transaction of $${amountToDeduct.toLocaleString('en-US', {minimumFractionDigits: 2})} to ${merchantName} was successfully completed. You earned $${cashback.toLocaleString('en-US', {minimumFractionDigits: 2})} in Vault cashback!`,
+        body: `Your transaction of $${amountToDeduct.toLocaleString('en-US', { minimumFractionDigits: 2 })} to ${merchantName} was successfully completed. You earned $${cashback.toLocaleString('en-US', { minimumFractionDigits: 2 })} in Vault cashback!`,
         time: "Just now",
         alert: false
       });
@@ -328,7 +328,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
 
     try {
       // 1. Update transaction to declined state
-      const { error: txError } = await supabase.from('transactions').update({ 
+      const { error: txError } = await supabase.from('transactions').update({
         pending: false,
         category: 'Failed',
         merchant: tx.merchant + ' (Declined)'
@@ -340,7 +340,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
         user_id: userId,
         icon_type: 'error',
         title: "Transaction Failed",
-        body: `Your transaction of $${tx.amount.toLocaleString('en-US', {minimumFractionDigits: 2})} to ${tx.merchant} failed and was declined by your bank.`,
+        body: `Your transaction of $${tx.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })} to ${tx.merchant} failed and was declined by your bank.`,
         time: "Just now",
         alert: true
       });
@@ -367,10 +367,10 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
 
   const addTransaction = async (transaction: any) => {
     if (!activeUserId) return;
-    
+
     // Remove client-side temp ID so Supabase can generate a valid UUID
     const { id, ...txData } = transaction;
-    
+
     const { error } = await supabase.from('transactions').insert({
       ...txData,
       user_id: activeUserId,
@@ -406,11 +406,11 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, balance: newBalance, vaultBalance: newVaultBalance } : u));
 
     try {
-      const { error } = await supabase.from('profiles').update({ 
-        balance: newBalance, 
-        vault_balance: newVaultBalance 
+      const { error } = await supabase.from('profiles').update({
+        balance: newBalance,
+        vault_balance: newVaultBalance
       }).eq('id', userId);
-      
+
       if (error) throw error;
       fetchData(); // Confirm with server
     } catch (err) {
@@ -429,9 +429,9 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, balance: newBalance, vaultBalance: newVaultBalance } : u));
 
     try {
-      const { error } = await supabase.from('profiles').update({ 
-        balance: newBalance, 
-        vault_balance: newVaultBalance 
+      const { error } = await supabase.from('profiles').update({
+        balance: newBalance,
+        vault_balance: newVaultBalance
       }).eq('id', userId);
 
       if (error) throw error;
@@ -466,7 +466,7 @@ export const BankProvider = ({ children }: { children: React.ReactNode }) => {
       await supabase.from('transactions').delete().eq('user_id', userId);
       // Delete all messages/notifications for this user
       await supabase.from('messages').delete().eq('user_id', userId);
-      
+
       console.log("User data cleared successfully");
       fetchData();
     } catch (err) {
