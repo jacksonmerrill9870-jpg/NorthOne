@@ -199,3 +199,40 @@
 .retryBtn:hover {
   background: #e1e4e8;
 }
+
+.linkingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 0;
+}
+
+.linkingIcon {
+  margin-bottom: 20px;
+}
+
+.spinIcon {
+  animation: spin 2s linear infinite;
+}
+
+.linkingText {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 24px;
+}
+
+.progressContainer {
+  width: 100%;
+  max-width: 300px;
+  height: 6px;
+  background: #f0f0f0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background: #5cb85c;
+  width: 0%;
+}

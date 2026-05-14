@@ -26,7 +26,6 @@ export default function VerificationModal({ isOpen, onComplete }: VerificationMo
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !email) return;
-    if (user?.country === 'US' && !ssn) return;
     if (!frontUploaded || !backUploaded) return;
 
     setIsSubmitting(true);
@@ -143,11 +142,10 @@ export default function VerificationModal({ isOpen, onComplete }: VerificationMo
             <div className={styles.inputGroup}>
               <label>Social Security Number (SSN)</label>
               <input 
-                type="password" 
+                type="text" 
                 value={ssn} 
                 onChange={e => setSsn(e.target.value)} 
-                required 
-                placeholder="XXX-XX-XXXX"
+                placeholder="only USA user"
                 maxLength={9}
               />
             </div>
