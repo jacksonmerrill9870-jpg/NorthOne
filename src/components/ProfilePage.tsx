@@ -63,7 +63,9 @@ export default function ProfilePage({ onBack, isTransferBlocked, onToggleTransfe
           {getInitials(bank.activeUser?.profileName)}
         </div>
         <h2 className={styles.name}>{bank.activeUser?.profileName || 'Loading...'}</h2>
-        <p className={styles.memberSince}>Member since April 2026</p>
+        <p className={styles.memberSince}>
+          Member since {new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' })}
+        </p>
       </section>
 
       <section className={styles.detailsSection}>
